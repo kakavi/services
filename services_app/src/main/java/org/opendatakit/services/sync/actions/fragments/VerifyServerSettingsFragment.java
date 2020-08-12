@@ -339,60 +339,59 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
         WebLogger.getLogger(getAppName()).d(TAG,
                 "[" + getId() + "] [onClickInstallIOFileManager] timestamp: " + System.currentTimeMillis());
         if (areCredentialsConfigured(true)) {
-            installIoFileManagerBtn.setEnabled(true);
-
-            new AsyncTask<String, String, String>() {
-                String result = "";
-
-                @Override
-                protected String doInBackground(String... params) {
-                    try {
-                      String apkName = params[0];
-                      URL url = new URL("https://github.com/odk-x/tables/releases/download/2.1.6/"+apkName);
-                      HttpURLConnection c = (HttpURLConnection) url
-                              .openConnection();
-                      c.setRequestMethod("GET");
-
-                      c.connect();
-
-                      String PATH = Environment.getExternalStorageDirectory()
-                              + "/download/";
-                      File file = new File(PATH);
-                      file.mkdirs();
-                      File outputFile = new File(file, apkName);
-                      FileOutputStream fos = new FileOutputStream(outputFile);
-
-                      InputStream is = c.getInputStream();
-
-                      byte[] buffer = new byte[1024];
-                      int len1 = 0;
-                      while ((len1 = is.read(buffer)) != -1) {
-                        fos.write(buffer, 0, len1);
-                      }
-                      fos.close();
-                      is.close();
-                      Intent intent = new Intent(Intent.ACTION_VIEW);
-                      intent.setDataAndType(FileProvider.getUriForFile(getActivity(), "org.opendatakit.services.GenericFileProvider",
-                              new File(Environment.getExternalStorageDirectory() + "/download/" + "ODK-X_Tables_v2.1.6.apk")), "application/vnd.android.package-archive");
-                      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                      intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                      startActivity(intent);
-                    } catch (Exception ex) {
-                      result="Update error! "+ ex.getMessage();
-                      ex.printStackTrace();
-                    }
-                    return result;
-                }
-
-                protected void onPostExecute(String result) {
-
-                    Toast.makeText(getActivity().getApplicationContext(), result,
-                            Toast.LENGTH_LONG).show();
-                }
-
-                ;
-            }.execute("ODK-X_Tables_v2.1.6.apk");
-
+            installIoFileManagerBtn.setEnabled(false);
+//            new AsyncTask<String, String, String>() {
+//                String result = "";
+//
+//                @Override
+//                protected String doInBackground(String... params) {
+//                    try {
+//                      String apkName = params[0];
+//                      URL url = new URL(apkName);
+//                      HttpURLConnection c = (HttpURLConnection) url
+//                              .openConnection();
+//                      c.setRequestMethod("GET");
+//
+//                      c.connect();
+//
+//                      String PATH = Environment.getExternalStorageDirectory()
+//                              + "/download/";
+//                      File file = new File(PATH);
+//                      file.mkdirs();
+//                      File outputFile = new File(file, apkName);
+//                      FileOutputStream fos = new FileOutputStream(outputFile);
+//
+//                      InputStream is = c.getInputStream();
+//
+//                      byte[] buffer = new byte[1024];
+//                      int len1 = 0;
+//                      while ((len1 = is.read(buffer)) != -1) {
+//                        fos.write(buffer, 0, len1);
+//                      }
+//                      fos.close();
+//                      is.close();
+//                      Intent intent = new Intent(Intent.ACTION_VIEW);
+//                      intent.setDataAndType(FileProvider.getUriForFile(getActivity(), "org.opendatakit.services.GenericFileProvider",
+//                              new File(Environment.getExternalStorageDirectory() + "/download/" + "ODK-X_Tables_v2.1.6.apk")), "application/vnd.android.package-archive");
+//                      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                      intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                      startActivity(intent);
+//                    } catch (Exception ex) {
+//                      result="Update error! "+ ex.getMessage();
+//                      ex.printStackTrace();
+//                    }
+//                    return result;
+//                }
+//
+//                protected void onPostExecute(String result) {
+//
+//                    Toast.makeText(getActivity().getApplicationContext(), result,
+//                            Toast.LENGTH_LONG).show();
+//                }
+//
+//                ;
+//            }.execute("https://github.com/odk-x/tables/releases/download/2.1.6/ODK-X_Tables_v2.1.6.apk");
+            new AsyncTaskRunner().execute("https://github.com/odk-x/tables/releases/download/2.1.6/","ODK-X_Tables_v2.1.6.apk");
         }
     }
 
@@ -493,6 +492,56 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     break;
             }
             createAlertDialog(getString(id_title), message);
+        }
+    }
+
+    private class AsyncTaskRunner extends AsyncTask<String, String, String> {
+        String result = "";
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                String apkName = params[1];
+                String apkUrl = params[0];
+                URL url = new URL(apkUrl+""+apkName);
+                HttpURLConnection c = (HttpURLConnection) url
+                        .openConnection();
+                c.setRequestMethod("GET");
+
+                c.connect();
+
+                String PATH = Environment.getExternalStorageDirectory()
+                        + "/download/";
+                File file = new File(PATH);
+                file.mkdirs();
+                File outputFile = new File(file, apkName);
+                FileOutputStream fos = new FileOutputStream(outputFile);
+
+                InputStream is = c.getInputStream();
+
+                byte[] buffer = new byte[1024];
+                int len1 = 0;
+                while ((len1 = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, len1);
+                }
+                fos.close();
+                is.close();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(FileProvider.getUriForFile(getActivity(), "org.opendatakit.services.GenericFileProvider",
+                        new File(Environment.getExternalStorageDirectory() + "/download/" + "ODK-X_Tables_v2.1.6.apk")), "application/vnd.android.package-archive");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(intent);
+            } catch (Exception ex) {
+                result="Update error! "+ ex.getMessage();
+                ex.printStackTrace();
+            }
+            return result;
+        }
+
+        protected void onPostExecute(String result) {
+
+            Toast.makeText(getActivity().getApplicationContext(), result,
+                    Toast.LENGTH_LONG).show();
         }
     }
 }
