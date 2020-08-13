@@ -105,8 +105,7 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
 
     //background service
     mWorkManager = WorkManager.getInstance();
-    //startBackgroundJob();
-    performSync(SyncAttachmentState.SYNC);
+    startBackgroundJob();
 
     //firebase
     FirebaseInstanceId.getInstance().getInstanceId()
