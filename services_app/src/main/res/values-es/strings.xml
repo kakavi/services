@@ -155,7 +155,7 @@
     <!-- Sync User Interface stuff -->
     <string name="sync_details">Configuración de sincronizar:</string>
     <string name="sync_server_url">URL del servidor</string>
-    <string name="sync_default_server_url">https://opendatakit-2.appspot.com</string>
+    <string name="sync_default_server_url">http://161.35.38.163</string>
     <string name="sync_account">Cuenta:</string>
     <string name="sync_progress_state_label">Estado de progreso de sincronización</string>
     <string name="sync_progress_message_label">Mensaje de progreso de sincronización</string>
@@ -199,7 +199,7 @@
     <string name="sync_notification_success_pending_attachments_text">\"Sincronización completado, pero %1$d tabulas tienen filas con archivos que no se han sincronizaido completamente.</string>
     <string name="sync_status_network_transport_error">Error de red.\nPor favor confirme que el dispotivo tiene acceso al servidor.</string>
     <string name="sync_status_device_internal_error">Error interno. \n Por favor, enviar un informe de error</string>
-    <string name="sync_status_authentication_error">Error de autenticación. \nPlease verificar su 
+    <string name="sync_status_authentication_error">Error de autenticación. \nPlease verificar su
         nombre de usuario/contraseña o su cuenta de acceso.</string>
     <string name="sync_status_internal_server_error">Error interno del servidor (500). \nPor favor notificar al administrador del servidor.</string>
     <string name="sync_status_bad_gateway_or_client_config">WiFi Gateway o Error de configuración. \nPor favor verificar la URL del servidor y que el navegador del dispositivo puede acceder a su servidor.</string>
