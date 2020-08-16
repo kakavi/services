@@ -4,7 +4,7 @@
 		<EditTextPreference
 			android:id="@+id/server_url"
 			android:key="common.sync_server_url"
-			android:defaultValue="@string/default_sync_server_url"
+			android:defaultValue="@string/sync_default_server_url"
 			android:title="@string/server_url"
 			android:inputType="textNoSuggestions"
 			android:dialogTitle="@string/change_server_url" 
