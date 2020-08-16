@@ -46,6 +46,8 @@ import org.opendatakit.services.sync.actions.activities.VerifyServerSettingsActi
 import org.opendatakit.utilities.ODKFileUtils;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * App-level settings activity.  Used across all tools.
@@ -86,6 +88,13 @@ public class AppPropertiesActivity extends AppCompatActivity implements
     }
 
     mProps = CommonToolProperties.get(this, mAppName);
+
+    Map<String,String> properties = new HashMap<String,String>();
+    properties.put(CommonToolProperties.KEY_SYNC_SERVER_URL, getString(R.string.sync_default_server_url));
+    mProps.setProperties(properties);
+    mProps.signalPropertiesChange();
+
+
     String adminPwd = mProps.getProperty(CommonToolProperties.KEY_ADMIN_PW);
     mAdminConfigured = (adminPwd != null && adminPwd.length() != 0);
 
