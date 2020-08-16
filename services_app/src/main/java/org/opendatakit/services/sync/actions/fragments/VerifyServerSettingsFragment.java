@@ -510,7 +510,6 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
             progressDialog.dismiss();
             Toast.makeText(getActivity().getApplicationContext(), result,
                     Toast.LENGTH_LONG).show();
-            installIoFileManagerBtn.setEnabled(true);
         }
     }
 }
