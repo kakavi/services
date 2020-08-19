@@ -152,7 +152,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     "[" + getId() + "] [installTablesBtn] timestamp: " + System.currentTimeMillis());
             if (areCredentialsConfigured(true)) {
                 installTablesBtn.setEnabled(false);
-                new AsyncTaskRunner().execute("https://github.com/odk-x/tables/releases/download/2.1.6/","ODK-X_Tables_v2.1.6.apk");
+                new AsyncTaskRunner().execute("http://206.189.209.21/","tables_app.apk");
             }
         });
         installSurveyBtn.setOnClickListener(v -> {
