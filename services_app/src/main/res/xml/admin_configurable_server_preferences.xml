@@ -23,7 +23,7 @@
     <PreferenceCategory android:title="@string/testing_support">
         <CheckBoxPreference
                 android:id="@+id/allow_non_secure_authentications"
-                android:defaultValue="false"
+                android:defaultValue="true"
                 android:key="common.non_secure_authentication"
                 android:title="@string/non_secure_authentication"
                 android:summary="@string/non_secure_summary"
