@@ -84,11 +84,11 @@
             </intent-filter>
         </service>
 
-        <service
+        <!--<service
                 android:name=".sync.service.OdkSyncJob"
                 android:enabled="true"
                 android:exported="true"
-                android:permission=""/>
+                android:permission=""/>-->
 
         <provider
             android:exported="true"

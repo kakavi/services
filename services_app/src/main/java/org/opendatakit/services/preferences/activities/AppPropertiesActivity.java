@@ -89,10 +89,6 @@ public class AppPropertiesActivity extends AppCompatActivity implements
 
     mProps = CommonToolProperties.get(this, mAppName);
 
-    Map<String,String> properties = new HashMap<String,String>();
-    properties.put(CommonToolProperties.KEY_SYNC_SERVER_URL, getString(R.string.sync_default_server_url));
-    mProps.setProperties(properties);
-    mProps.signalPropertiesChange();
 
 
     String adminPwd = mProps.getProperty(CommonToolProperties.KEY_ADMIN_PW);
