@@ -202,7 +202,8 @@ public class LoginFragment extends AbsSyncUIFragment {
       String[] credentialEntries = getResources().getStringArray(R.array.credential_entries);
 
       if (credentialToUse == null) {
-         credentialToUse = getString(R.string.credential_type_none);
+         //credentialToUse = getString(R.string.credential_type_none);
+         credentialToUse = getString(R.string.credential_type_username_password);
       }
 
       for (int i = 0; i < credentialValues.length; ++i) {
@@ -215,6 +216,7 @@ public class LoginFragment extends AbsSyncUIFragment {
 
       if (credentialToUse.equals(getString(R.string.credential_type_none))) {
          accountIdentity.setText(getResources().getString(R.string.anonymous));
+         //accountIdentity.setText(account);
       } else if (credentialToUse.equals(getString(R.string.credential_type_username_password))) {
          String username = props.getProperty(CommonToolProperties.KEY_USERNAME);
          if (username == null || username.equals("")) {

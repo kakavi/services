@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.opendatakit.services">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="org.opendatakit.services">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -83,12 +84,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <!--<service
-                android:name=".sync.service.OdkSyncJob"
-                android:enabled="true"
-                android:exported="true"
-                android:permission=""/>-->
 
         <provider
             android:exported="true"

@@ -230,7 +230,8 @@ abstract class AbsSyncUIFragment extends Fragment implements
         String[] credentialEntries = getResources().getStringArray(R.array.credential_entries);
 
         if ( credentialToUse == null ) {
-            credentialToUse = getString(R.string.credential_type_none);
+           // credentialToUse = getString(R.string.credential_type_none);
+            credentialToUse = getString(R.string.credential_type_username_password);
         }
 
         for ( int i = 0 ; i < credentialValues.length ; ++i ) {
@@ -247,7 +248,8 @@ abstract class AbsSyncUIFragment extends Fragment implements
             account = account.substring(indexOfColon + 1);
         }
         if ( credentialToUse.equals(getString(R.string.credential_type_none))) {
-            accountIdentity.setText(getResources().getString(R.string.anonymous));
+            //accountIdentity.setText(getResources().getString(R.string.anonymous));
+            accountIdentity.setText(account);
         } else if ( credentialToUse.equals(getString(R.string.credential_type_username_password))) {
             accountIdentity.setText(account);
         } else {

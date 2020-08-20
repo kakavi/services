@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceScreen
+    <!--<PreferenceScreen
         android:icon="@drawable/ic_launch_black_24dp"
         android:title="@string/opendatakit_website"
         android:summary="@string/click_to_web"
         android:id="@+id/open_documentation"
-        android:key="@string/key_documentation" />
+        android:key="@string/key_documentation" />-->
 
     <PreferenceScreen
         android:fragment="org.opendatakit.services.preferences.fragments.ServerSettingsFragment"
@@ -26,13 +26,13 @@
         android:summary="@string/tool_tables_settings_summary" />
 
     <!-- this is visible if admin mode is not enabled OR if in admin mode -->
-    <PreferenceScreen
+   <!-- <PreferenceScreen
         android:id="@+id/admin_password_status"
         android:fragment="org.opendatakit.services.preferences.fragments.AdminPasswordSettingsFragment"
         android:icon="@drawable/ic_vpn_key_black_24dp"
         android:title="@string/change_admin_password"
         android:summary="@string/admin_password_disabled"
-        android:key="@string/key_admin_password" />
+        android:key="@string/key_admin_password" />-->
 
     <!-- these are visible if in admin mode -->
     <PreferenceScreen

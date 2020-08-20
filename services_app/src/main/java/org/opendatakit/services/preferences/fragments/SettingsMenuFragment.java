@@ -27,7 +27,7 @@ public class SettingsMenuFragment extends PreferenceFragmentCompat {
   public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
     setPreferencesFromResource(R.xml.preferences_menu, rootKey);
 
-    findPreference(getString(R.string.key_documentation))
+   /* findPreference(getString(R.string.key_documentation))
         .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
           @Override
           public boolean onPreferenceClick(Preference preference) {
@@ -45,7 +45,7 @@ public class SettingsMenuFragment extends PreferenceFragmentCompat {
 
             return true;
           }
-        });
+        });*/
   }
 
   @Override
@@ -71,8 +71,8 @@ public class SettingsMenuFragment extends PreferenceFragmentCompat {
             .setVisible(adminConfigured && !adminMode);
 
         // enable when admin is not configured or in admin mode
-        findPreference(getString(R.string.key_admin_password))
-            .setVisible(!adminConfigured || adminMode);
+        /*findPreference(getString(R.string.key_admin_password))
+            .setVisible(!adminConfigured || adminMode);*/
 
         findPreference(getString(R.string.key_reset_config))
             .setVisible(!adminConfigured || adminMode);
@@ -82,14 +82,14 @@ public class SettingsMenuFragment extends PreferenceFragmentCompat {
     preferenceViewModel.getAdminConfigured().observe(this, new Observer<Boolean>() {
       @Override
       public void onChanged(Boolean adminConfigured) {
-        Preference adminPwdPref = findPreference(getString(R.string.key_admin_password));
-        if (adminConfigured) {
+        //Preference adminPwdPref = findPreference(getString(R.string.key_admin_password));
+        /*if (adminConfigured) {
           adminPwdPref.setTitle(R.string.change_admin_password);
           adminPwdPref.setSummary(R.string.admin_password_enabled);
         } else {
           adminPwdPref.setTitle(R.string.enable_admin_password);
           adminPwdPref.setSummary(R.string.admin_password_disabled);
-        }
+        }*/
 
         Boolean adminMode = preferenceViewModel.getAdminMode().getValue();
         adminMode = adminMode != null && adminMode;
@@ -98,7 +98,7 @@ public class SettingsMenuFragment extends PreferenceFragmentCompat {
             .setVisible(adminConfigured && !adminMode);
 
         // enable when admin is not configured or in admin mode
-        adminPwdPref.setVisible(!adminConfigured || adminMode);
+        //adminPwdPref.setVisible(!adminConfigured || adminMode);
 
         findPreference(getString(R.string.key_reset_config))
             .setVisible(!adminConfigured || adminMode);
