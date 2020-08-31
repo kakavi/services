@@ -68,7 +68,7 @@ public class AppPropertiesActivity extends AppCompatActivity implements
   private boolean mAdminMode;
   private boolean mAdminConfigured;
   private Activity mActivity = this;
-  
+
   private PropertiesSingleton mProps;
   private PreferenceViewModel preferenceViewModel;
 
@@ -94,8 +94,9 @@ public class AppPropertiesActivity extends AppCompatActivity implements
     String adminPwd = mProps.getProperty(CommonToolProperties.KEY_ADMIN_PW);
     mAdminConfigured = (adminPwd != null && adminPwd.length() != 0);
 
+    //for testing purposes, admin mode default true
     mAdminMode =
-        getIntent().getBooleanExtra(IntentConsts.INTENT_KEY_SETTINGS_IN_ADMIN_MODE, false);
+        getIntent().getBooleanExtra(IntentConsts.INTENT_KEY_SETTINGS_IN_ADMIN_MODE, true);
 
     preferenceViewModel = ViewModelProviders
         .of(this)
