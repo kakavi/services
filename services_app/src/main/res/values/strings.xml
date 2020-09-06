@@ -216,15 +216,15 @@
         Please update your settings.</string>
 
     <string name="verify_server_settings_start">Verify User Permissions</string>
-    <string name="install_tables_label">Install Tables</string>
-    <string name="install_forms_label">Install Survey</string>
-    <string name="install_IO_label">Install IO</string>
+    <string name="install_tables_label">Install Everflow</string>
+    <string name="install_forms_label">Install Kenga Survey</string>
+    <string name="install_IO_label">Install IO File Manager</string>
     <string name="verify_server_settings_starting">Starting fetch of user permissions&#8230;</string>
     <string name="verifying_server_settings">Verifying User Permissions&#8230;</string>
     <string name="verify_server_setttings_successful">Verification successful</string>
     <string name="verify_server_setttings_successful_text">Success! User permissions have been updated.</string>
-    <string name="verify_server_settings_header">Verify User Permissions</string>
-    <string name="click_to_verify_server_settings">Click to Verify User Permissions</string>
+    <string name="verify_server_settings_header">Install Support Apps</string>
+    <string name="click_to_verify_server_settings">Click to check/install support apps</string>
     <string name="warning_no_user_roles">Warning: User permissions have not been verified!\nRunning with reduced privileges.</string>
     <!-- sync service layer messages -->
     <string name="sync_notification_syncing">"Kenga Sync In Progress %1$s</string>

@@ -24,11 +24,7 @@ import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
+import android.widget.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -37,13 +33,13 @@ import org.opendatakit.database.RoleConsts;
 import org.opendatakit.logging.WebLogger;
 import org.opendatakit.properties.CommonToolProperties;
 import org.opendatakit.properties.PropertiesSingleton;
+import org.opendatakit.services.MainActivity;
 import org.opendatakit.services.R;
 import org.opendatakit.services.preferences.activities.IOdkAppPropertiesActivity;
 import org.opendatakit.services.sync.actions.SyncActions;
 import org.opendatakit.services.sync.actions.activities.DoSyncActionCallback;
 import org.opendatakit.services.sync.actions.activities.ISyncServiceInterfaceActivity;
 import org.opendatakit.services.sync.actions.activities.LoginActivity;
-import org.opendatakit.services.sync.actions.activities.SyncActivity;
 import org.opendatakit.sync.service.IOdkSyncServiceInterface;
 import org.opendatakit.sync.service.SyncAttachmentState;
 import org.opendatakit.sync.service.SyncOverallResult;
@@ -84,7 +80,7 @@ public class SyncFragment extends AbsSyncUIFragment {
 
   private LinearLayout resetButtonPane;
 
-  private SyncAttachmentState syncAttachmentState = SyncAttachmentState.SYNC;
+  private SyncAttachmentState syncAttachmentState = SyncAttachmentState.NONE;
   private SyncActions syncAction = SyncActions.IDLE;
 
   public SyncFragment() {
@@ -106,7 +102,7 @@ public class SyncFragment extends AbsSyncUIFragment {
       try {
         syncAttachmentState = SyncAttachmentState.valueOf(treatment);
       } catch (IllegalArgumentException e) {
-        syncAttachmentState = SyncAttachmentState.SYNC;
+        syncAttachmentState = SyncAttachmentState.NONE;
       }
     }
 
@@ -126,7 +122,7 @@ public class SyncFragment extends AbsSyncUIFragment {
 
     View view = inflater.inflate(ID, container, false);
 
-    infoPane = view.findViewById(R.id.sync_info_pane);
+    //infoPane = view.findViewById(R.id.sync_info_pane);
     populateTextViewMemberVariablesReferences(view);
 
     syncInstanceAttachmentsSpinner = view.findViewById(R.id.sync_instance_attachments);
@@ -136,7 +132,7 @@ public class SyncFragment extends AbsSyncUIFragment {
       try {
         syncAttachmentState = SyncAttachmentState.valueOf(treatment);
       } catch (IllegalArgumentException e) {
-        syncAttachmentState = SyncAttachmentState.SYNC;
+        syncAttachmentState = SyncAttachmentState.NONE;
       }
     }
 
@@ -161,7 +157,7 @@ public class SyncFragment extends AbsSyncUIFragment {
 
       @Override public void onNothingSelected(AdapterView<?> parent) {
         String[] syncAttachmentType = getResources().getStringArray(R.array.sync_attachment_option_values);
-        syncAttachmentState = SyncAttachmentState.SYNC;
+        syncAttachmentState = SyncAttachmentState.NONE;
         for (int i = 0; i < syncAttachmentType.length; ++i) {
           if (syncAttachmentType[i].equals(syncAttachmentState.name())) {
             syncInstanceAttachmentsSpinner.setSelection(i);
@@ -183,12 +179,12 @@ public class SyncFragment extends AbsSyncUIFragment {
         onClickResetServer(v);
       }
     });
-    changeUser = view.findViewById(R.id.change_user_button);
+   /* changeUser = view.findViewById(R.id.change_user_button);
     changeUser.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         onClickChangeUser(v);
       }
-    });
+    });*/
 
     resetButtonPane = view.findViewById(R.id.sync_reset_button_pane);
 
@@ -232,6 +228,8 @@ public class SyncFragment extends AbsSyncUIFragment {
     }
 
     String url = props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL);
+    Toast.makeText(getActivity(),url,
+            Toast.LENGTH_LONG).show();
     if (url == null || url.length() == 0) {
       disableButtons();
     } else {
@@ -257,7 +255,7 @@ public class SyncFragment extends AbsSyncUIFragment {
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
 
-    if (requestCode == SyncActivity.AUTHORIZE_ACCOUNT_RESULT_CODE) {
+    if (requestCode == MainActivity.AUTHORIZE_ACCOUNT_RESULT_CODE) {
       if (resultCode == Activity.RESULT_CANCELED) {
         syncAction = SyncActions.IDLE;
       }
@@ -473,7 +471,7 @@ public class SyncFragment extends AbsSyncUIFragment {
    */
   public void onClickSyncNow(View v) {
     WebLogger.getLogger(getAppName()).d(TAG, "[" + getId() + "] [onClickSyncNow] timestamp: " + System.currentTimeMillis());
-    if (areCredentialsConfigured(false)) {
+    if (areCredentialsConfigured(true)) {
       disableButtons();
       syncAction = SyncActions.SYNC;
       prepareForSyncAction();

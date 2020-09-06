@@ -13,6 +13,7 @@
  */
 package org.opendatakit.services.utilities;
 
+import android.content.pm.PackageManager;
 import org.opendatakit.properties.CommonToolProperties;
 import org.opendatakit.properties.PropertiesSingleton;
 
@@ -61,6 +62,15 @@ public class ODKServicesPropertyUtils {
          throw new IllegalStateException("unexpected authentication type!");
       }
       return activeUserName;
+   }
+
+   public static boolean isPackageInstalled(String packageName, PackageManager packageManager) {
+      try {
+         packageManager.getPackageInfo(packageName, 0);
+         return true;
+      } catch (PackageManager.NameNotFoundException e) {
+         return false;
+      }
    }
 
 }

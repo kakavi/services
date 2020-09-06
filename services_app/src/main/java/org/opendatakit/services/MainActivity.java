@@ -16,6 +16,7 @@ package org.opendatakit.services;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -38,23 +38,29 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import org.opendatakit.activities.IAppAwareActivity;
 import org.opendatakit.consts.IntentConsts;
-import org.opendatakit.fragment.AboutMenuFragment;
 import org.opendatakit.logging.WebLogger;
+import org.opendatakit.properties.CommonToolProperties;
+import org.opendatakit.properties.PropertiesSingleton;
 import org.opendatakit.services.database.AndroidConnectFactory;
 import org.opendatakit.services.preferences.activities.AppPropertiesActivity;
+import org.opendatakit.services.preferences.fragments.ServerSettingsFragment;
 import org.opendatakit.services.resolve.conflict.AllConflictsResolutionActivity;
-import org.opendatakit.services.sync.actions.SyncActions;
 import org.opendatakit.services.sync.actions.activities.*;
 import org.opendatakit.services.sync.actions.fragments.SyncFragment;
 import org.opendatakit.services.sync.service.OdkSyncJob;
-import org.opendatakit.sync.service.*;
+import org.opendatakit.services.utilities.ODKServicesPropertyUtils;
+import org.opendatakit.sync.service.IOdkSyncServiceInterface;
+import org.opendatakit.sync.service.SyncAttachmentState;
 import org.opendatakit.utilities.ODKFileUtils;
 import org.opendatakit.utilities.RuntimePermissionUtils;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity implements ISyncServiceInterfaceActivity, IAppAwareActivity,
+public class MainActivity extends AbsSyncBaseActivity implements ISyncServiceInterfaceActivity, IAppAwareActivity,
     ActivityCompat.OnRequestPermissionsResultCallback {
+
+  private AlertDialog mDialog;
 
   // Used for logging
   @SuppressWarnings("unused") private static final String TAG = MainActivity.class.getSimpleName();
@@ -71,7 +77,8 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
   private int RESOLVE_CONFLICT_ACTIVITY_RESULT_CODE = 30;
   private int SETTINGS_ACTIVITY_RESULT_CODE = 100;
 
-  private String mAppName;
+  protected String appName;
+  protected PropertiesSingleton props;
   private boolean permissionOnly;
   private WorkManager mWorkManager;
 
@@ -107,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
     mWorkManager = WorkManager.getInstance();
     startBackgroundJob();
 
+    launch(savedInstanceState);
+
     //firebase
     FirebaseInstanceId.getInstance().getInstanceId()
             .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
@@ -127,19 +136,92 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
             });
   }
 
+  private void launch(Bundle savedInstanceState) {
+    mProps = CommonToolProperties.get(this, ODKFileUtils.getOdkDefaultAppName());
+
+    if (savedInstanceState == null) {
+      FragmentManager mgr = getSupportFragmentManager();
+      Fragment newFragment = new SyncFragment();
+      FragmentTransaction ft = mgr.beginTransaction();
+      ft.add(R.id.sync_activity_view, newFragment).commit();
+    }
+
+    boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
+    if (isFirstLaunch) {
+      // set first launch to false
+      mProps.setProperties(Collections.singletonMap(CommonToolProperties
+              .KEY_FIRST_LAUNCH, "false"));
+      AlertDialog.Builder builder = new AlertDialog.Builder(this);
+      mDialog = builder.setMessage(R.string.configure_server_settings)
+              .setCancelable(false)
+              .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                @Override public void onClick(DialogInterface dialog, int which) {
+                  mDialog.dismiss();
+
+                  getSupportFragmentManager()
+                          .beginTransaction()
+                          .replace(R.id.sync_activity_view, new ServerSettingsFragment())
+                          .addToBackStack(null)
+                          .commit();
+                }
+              })
+              .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                @Override public void onClick(DialogInterface dialog, int which) {
+                  dialog.dismiss();
+                }
+              }).create();
+      mDialog.setCanceledOnTouchOutside(false);
+      mDialog.show();
+    }
+  }
+
   @Override
   protected void onResume() {
     super.onResume();
-    // Do this in on resume so that if we resolve a row it will be refreshed
-    // when we come back.
-    mAppName = getIntent().getStringExtra(IntentConsts.INTENT_KEY_APP_NAME);
-    if (mAppName == null) {
-      mAppName = ODKFileUtils.getOdkDefaultAppName();
-      //      Log.e(TAG, IntentConsts.INTENT_KEY_APP_NAME + " not supplied on intent");
-      //      setResult(Activity.RESULT_CANCELED);
-      //      finish();
-      //      return;
+
+    //check if apps installed
+    //check if apps installed
+    boolean isIOInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.openintents.filemanager", this.getPackageManager());
+    boolean isSurveyInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.survey", this.getPackageManager());
+    boolean isTablesInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.tables", this.getPackageManager());
+
+    if(isIOInstalled || isSurveyInstalled || isTablesInstalled) {
+      //installed
+    } else {
+      Toast.makeText(this, "Please install app to continue", Toast.LENGTH_SHORT).show();
+      Intent intent = new Intent(this, VerifyServerSettingsActivity.class);
+      startActivity(intent);
     }
+
+    appName = getIntent().getStringExtra(IntentConsts.INTENT_KEY_APP_NAME);
+    if (appName == null) {
+      appName = ODKFileUtils.getOdkDefaultAppName();
+      /*Log.e(TAG, IntentConsts.INTENT_KEY_APP_NAME + " not supplied on intent");
+      setResult(Activity.RESULT_CANCELED);
+      finish();*/
+      return;
+    }
+
+    firstLaunch();
+    WebLogger.getLogger(getAppName()).i(TAG, "[onResume] getting SyncFragment");
+
+    FragmentManager mgr = getSupportFragmentManager();
+    String newFragmentName;
+    Fragment newFragment;
+
+    // we want the list fragment
+    newFragmentName = SyncFragment.NAME;
+    newFragment = mgr.findFragmentByTag(newFragmentName);
+    if ( newFragment == null ) {
+      newFragment = new SyncFragment();
+      WebLogger.getLogger(getAppName()).i(TAG, "[onResume] creating new SyncFragment");
+
+      FragmentTransaction trans = mgr.beginTransaction();
+      trans.replace(R.id.sync_activity_view, newFragment, newFragmentName);
+      WebLogger.getLogger(getAppName()).i(TAG, "[onResume] replacing fragment with id " + newFragment.getId());
+      trans.commit();
+    }
+
   }
 
   @Override
@@ -155,7 +237,8 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
     // automatically handle clicks on the Home/Up button, so long
     // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
-    if (id == R.id.action_sync) {
+
+   /* if (id == R.id.action_sync) {
       Intent i = new Intent(this, SyncActivity.class);
       i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, getAppName());
       startActivityForResult(i, SYNC_ACTIVITY_RESULT_CODE);
@@ -167,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
       i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, getAppName());
       startActivityForResult(i, VERIFY_SERVER_SETTINGS_ACTIVITY_RESULT_CODE);
       return true;
-    }
+    }*/
 
     if (id == R.id.action_resolve_conflict) {
       Intent i = new Intent(this, AllConflictsResolutionActivity.class);
@@ -176,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
       return true;
     }
 
-    if (id == R.id.action_about) {
+   /* if (id == R.id.action_about) {
 
       FragmentManager mgr = getSupportFragmentManager();
       Fragment newFragment = mgr.findFragmentByTag(AboutMenuFragment.NAME);
@@ -189,6 +272,14 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
       trans.commit();
 
       return true;
+    }*/
+
+    if (id == R.id.action_change_user) {
+
+      Intent i = new Intent(this, LoginActivity.class);
+      i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, mAppName);
+      startActivity(i);
+      return true;
     }
 
     if (id == R.id.action_settings) {
@@ -196,14 +287,6 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
       Intent intent = new Intent(this, AppPropertiesActivity.class);
       intent.putExtra(IntentConsts.INTENT_KEY_APP_NAME, getAppName());
       startActivityForResult(intent, SETTINGS_ACTIVITY_RESULT_CODE);
-      return true;
-    }
-
-    if (id == R.id.action_change_user) {
-
-      Intent i = new Intent(this, LoginActivity.class);
-      i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, mAppName);
-      startActivity(i);
       return true;
     }
 
@@ -282,9 +365,7 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
               @Override public void doAction(IOdkSyncServiceInterface syncServiceInterface)
                       throws RemoteException {
                 if (syncServiceInterface != null) {
-                      iOdkSyncServiceInterface = syncServiceInterface;
-                      iOdkSyncServiceInterface.synchronizeWithServer(getAppName(), syncAttachmentState);
-
+                    syncServiceInterface.synchronizeWithServer(getAppName(), syncAttachmentState);
                 }
               }
             });
@@ -301,5 +382,37 @@ public class MainActivity extends AppCompatActivity implements ISyncServiceInter
       }
     }
 
+  }
+
+  private void firstLaunch() {
+     mProps = CommonToolProperties.get(this, mAppName);
+
+    boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
+    if (isFirstLaunch) {
+      // set first launch to false
+      mProps.setProperties(Collections.singletonMap(CommonToolProperties
+              .KEY_FIRST_LAUNCH, "false"));
+      AlertDialog.Builder builder = new AlertDialog.Builder(this);
+      mDialog = builder.setMessage(R.string.configure_server_settings)
+              .setCancelable(false)
+              .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                @Override public void onClick(DialogInterface dialog, int which) {
+                  mDialog.dismiss();
+
+                  getSupportFragmentManager()
+                          .beginTransaction()
+                          .replace(R.id.sync_activity_view, new ServerSettingsFragment())
+                          .addToBackStack(null)
+                          .commit();
+                }
+              })
+              .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                @Override public void onClick(DialogInterface dialog, int which) {
+                  dialog.dismiss();
+                }
+              }).create();
+      mDialog.setCanceledOnTouchOutside(false);
+      mDialog.show();
+    }
   }
 }

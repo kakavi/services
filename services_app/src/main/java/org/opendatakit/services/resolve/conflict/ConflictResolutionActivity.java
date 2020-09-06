@@ -109,7 +109,7 @@ public class ConflictResolutionActivity extends AppCompatActivity implements IAp
     trans.replace(R.id.conflict_resolver_activity_view, newFragment, newFragmentName);
     trans.commit();
   }
-  
+
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
@@ -124,8 +124,8 @@ public class ConflictResolutionActivity extends AppCompatActivity implements IAp
 
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
-    menu.findItem(R.id.action_sync).setVisible(false);
-    menu.findItem(R.id.action_verify_server_settings).setVisible(false);
+   // menu.findItem(R.id.action_sync).setVisible(false);
+   // menu.findItem(R.id.action_verify_server_settings).setVisible(false);
     menu.findItem(R.id.action_resolve_conflict).setVisible(false);
     menu.findItem(R.id.action_change_user).setVisible(false);
     return super.onPrepareOptionsMenu(menu);
@@ -137,16 +137,16 @@ public class ConflictResolutionActivity extends AppCompatActivity implements IAp
     // automatically handle clicks on the Home/Up button, so long
     // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
-    if (id == R.id.action_sync) {
+  /*  if (id == R.id.action_sync) {
       return true;
     }
     if (id == R.id.action_verify_server_settings) {
       return true;
-    }
+    }*/
     if (id == R.id.action_resolve_conflict) {
       return true;
     }
-    if (id == R.id.action_about) {
+/*    if (id == R.id.action_about) {
 
       FragmentManager mgr = getSupportFragmentManager();
       Fragment newFragment = mgr.findFragmentByTag(AboutMenuFragment.NAME);
@@ -159,7 +159,7 @@ public class ConflictResolutionActivity extends AppCompatActivity implements IAp
       trans.commit();
 
       return true;
-    }
+    }*/
     return super.onOptionsItemSelected(item);
   }
 

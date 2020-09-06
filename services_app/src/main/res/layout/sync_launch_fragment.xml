@@ -10,7 +10,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <LinearLayout
+<!--        <LinearLayout
                 android:id="@+id/sync_info_pane"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -65,18 +65,19 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginEnd="20dp"
-                android:text="@string/change_user"/>
+                android:text="@string/change_user"/>-->
 
-        <Space
+        <View
                 android:layout_width="match_parent"
                 android:layout_height="40dp"/>
 
         <Spinner
                 android:id="@+id/sync_instance_attachments"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
+                android:layout_margin="20dp"
                 android:layout_marginTop="10dp"
+                style="@style/Widget.AppCompat.Spinner"
         />
 
         <Button
@@ -88,6 +89,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginTop="10dp"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:text="@string/sync_start"/>
 
         <!-- TODO: Hiding these until we settle on a new Sync UI. For now its just the
@@ -139,6 +141,8 @@
                     android:id="@+id/sync_reset_server_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/Widget.AppCompat.Button"
+                    android:padding="15dp"
                     android:text="@string/sync_reset_server"/>
         </LinearLayout>
     </LinearLayout>

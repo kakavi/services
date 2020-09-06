@@ -130,7 +130,7 @@ public abstract class AbsSyncBaseActivity extends AppCompatActivity
       super.onCreate(savedInstanceState);
 
       WebLogger.getLogger(getAppName()).i(TAG, " [onCreate]");
-      setContentView(R.layout.sync_activity);
+      setContentView(R.layout.activity_main);
 
       // IMPORTANT NOTE: the Application object is not yet created!
       // Used to ensure that the singleton has been initialized properly
@@ -156,12 +156,13 @@ public abstract class AbsSyncBaseActivity extends AppCompatActivity
 
       // Do this in on resume so that if we resolve a row it will be refreshed
       // when we come back.
-      if (getAppName() == null) {
-         Log.e(TAG, IntentConsts.INTENT_KEY_APP_NAME + " [onResume] not supplied on intent");
-         setResult(Activity.RESULT_CANCELED);
-         finish();
-         return;
-      }
+       if (mAppName == null) {
+           mAppName = ODKFileUtils.getOdkDefaultAppName();
+              /*Log.e(TAG, IntentConsts.INTENT_KEY_APP_NAME + " not supplied on intent");
+              setResult(Activity.RESULT_CANCELED);
+              finish();*/
+           return;
+       }
 
       try {
          WebLogger.getLogger(getAppName()).i(TAG, "[onResume] Attempting bind to sync service");
@@ -250,9 +251,9 @@ public abstract class AbsSyncBaseActivity extends AppCompatActivity
 
    @Override
    public boolean onPrepareOptionsMenu(Menu menu) {
-      menu.findItem(R.id.action_sync).setVisible(false);
-      menu.findItem(R.id.action_verify_server_settings).setVisible(false);
-      menu.findItem(R.id.action_change_user).setVisible(false);
+      //menu.findItem(R.id.action_sync).setVisible(false);
+      //menu.findItem(R.id.action_verify_server_settings).setVisible(false);
+      menu.findItem(R.id.action_change_user).setVisible(true);
       // right?
       return super.onPrepareOptionsMenu(menu);
    }
@@ -264,12 +265,12 @@ public abstract class AbsSyncBaseActivity extends AppCompatActivity
       // automatically handle clicks on the Home/Up button, so long
       // as you specify a parent activity in AndroidManifest.xml.
       int id = item.getItemId();
-      if (id == R.id.action_sync) {
+    /*  if (id == R.id.action_sync) {
          return true;
       }
       if (id == R.id.action_verify_server_settings) {
          return true;
-      }
+      }*/
 
       if (id == R.id.action_resolve_conflict) {
          Intent i = new Intent(this, AllConflictsResolutionActivity.class);
@@ -278,7 +279,7 @@ public abstract class AbsSyncBaseActivity extends AppCompatActivity
          return true;
       }
 
-      if (id == R.id.action_about) {
+  /*    if (id == R.id.action_about) {
 
          FragmentManager mgr = getSupportFragmentManager();
          Fragment newFragment = mgr.findFragmentByTag(AboutMenuFragment.NAME);
@@ -291,7 +292,7 @@ public abstract class AbsSyncBaseActivity extends AppCompatActivity
          trans.commit();
 
          return true;
-      }
+      }*/
 
       if (id == R.id.action_settings) {
 

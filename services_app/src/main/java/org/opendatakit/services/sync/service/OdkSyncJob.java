@@ -21,7 +21,7 @@ public class OdkSyncJob extends Worker {
         super(context, workerParams);
     }
 
-    private SyncAttachmentState syncAttachmentState = SyncAttachmentState.SYNC;
+    private SyncAttachmentState syncAttachmentState = SyncAttachmentState.NONE;
 
     @NonNull
     @Override

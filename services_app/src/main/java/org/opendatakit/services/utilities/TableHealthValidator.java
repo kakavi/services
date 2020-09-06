@@ -11,12 +11,12 @@ import org.opendatakit.consts.RequestCodeConsts;
 import org.opendatakit.database.service.DbHandle;
 import org.opendatakit.database.utilities.CursorUtils;
 import org.opendatakit.logging.WebLogger;
+import org.opendatakit.services.MainActivity;
 import org.opendatakit.services.R;
 import org.opendatakit.services.database.AndroidConnectFactory;
 import org.opendatakit.services.database.OdkConnectionFactorySingleton;
 import org.opendatakit.services.database.OdkConnectionInterface;
 import org.opendatakit.services.database.utilities.ODKDatabaseImplUtils;
-import org.opendatakit.services.sync.actions.activities.SyncActivity;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -130,7 +130,7 @@ public class TableHealthValidator {
 
         // Launch the Sync activity to sync your changes.
         // TODO: Can we check if we just came from sync and if so just return to that?
-        Intent i = new Intent(displayActivity, SyncActivity.class);
+        Intent i = new Intent(displayActivity, MainActivity.class);
         i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, appName);
         displayActivity.startActivity(i);
       }
