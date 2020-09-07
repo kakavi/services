@@ -184,7 +184,7 @@
 
     <!-- Sync User Interface stuff -->
     <string name="sync_details">Sync Configuration:</string>
-    <string name="sync_server_url">Server URL</string>
+    <string name="sync_server_url">Server URL:</string>
     <string name="sync_default_server_url">http://161.35.38.163</string>
     <string name="sync_account">Account:</string>
     <string name="sync_progress_state_label">Sync Progress State</string>
@@ -319,7 +319,7 @@
     <string name="change_credential">Change Sign-on Credential</string>
 
     <string name="username_password">Username and/or Password</string>
-    <string name="username">Username</string>
+    <string name="username">Username:</string>
     <string name="change_username">ODK-X Username</string>
     <string name="password">Server Password</string>
     <string name="change_server_password">Server Password</string>

@@ -146,7 +146,7 @@ public class SyncFragment extends AbsSyncUIFragment {
     }
 
     ArrayAdapter<CharSequence> instanceAttachmentsAdapter = ArrayAdapter
-        .createFromResource(getActivity(), R.array.sync_attachment_option_names, android.R.layout.select_dialog_item);
+        .createFromResource(getActivity(), R.array.sync_attachment_option_names, R.layout.spinner_item);
     syncInstanceAttachmentsSpinner.setAdapter(instanceAttachmentsAdapter);
 
     syncInstanceAttachmentsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

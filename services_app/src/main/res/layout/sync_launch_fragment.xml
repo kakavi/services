@@ -24,6 +24,7 @@
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="5dp"
                     android:textSize="20sp"
+                    android:textStyle="bold"
                     android:text="@string/sync_server_url"/>
 
             <TextView
@@ -35,6 +36,11 @@
                     android:layout_marginTop="5dp"
                     android:textSize="17sp"/>
 
+           <FrameLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:foreground="?attr/selectableItemBackground">
+
             <TextView
                     android:id="@+id/sync_account_auth_label"
                     android:layout_width="wrap_content"
@@ -42,7 +48,8 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="5dp"
-                    android:foreground="?attr/selectableItemBackground"
+                    android:textStyle="bold"
+                    android:labelFor="@+id/sync_account"
                     android:textSize="20sp"
                     android:text="@string/username"/>
 
@@ -52,10 +59,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:layout_marginTop="5dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:textSize="17sp"
-                    android:textStyle="bold"/>
+                    android:layout_marginTop="40dp"
+                    android:textSize="17sp"/>
+           </FrameLayout>
 
         </LinearLayout>
 
@@ -73,14 +79,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"/>
 
-        <Spinner
-                android:id="@+id/sync_instance_attachments"
-                android:layout_width="wrap_content"
+        <FrameLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
                 android:layout_marginTop="10dp"
+                android:background="@drawable/border">
+
+        <Spinner
+                android:id="@+id/sync_instance_attachments"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 style="@style/Widget.AppCompat.Spinner"
         />
+        </FrameLayout>
 
         <Button
                 android:id="@+id/sync_start_button"
