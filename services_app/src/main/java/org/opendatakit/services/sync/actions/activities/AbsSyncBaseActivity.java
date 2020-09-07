@@ -161,7 +161,7 @@ public abstract class AbsSyncBaseActivity extends AppCompatActivity
               /*Log.e(TAG, IntentConsts.INTENT_KEY_APP_NAME + " not supplied on intent");
               setResult(Activity.RESULT_CANCELED);
               finish();*/
-           return;
+          // return;
        }
 
       try {

@@ -122,7 +122,7 @@ public class SyncFragment extends AbsSyncUIFragment {
 
     View view = inflater.inflate(ID, container, false);
 
-    //infoPane = view.findViewById(R.id.sync_info_pane);
+    infoPane = view.findViewById(R.id.sync_info_pane);
     populateTextViewMemberVariablesReferences(view);
 
     syncInstanceAttachmentsSpinner = view.findViewById(R.id.sync_instance_attachments);

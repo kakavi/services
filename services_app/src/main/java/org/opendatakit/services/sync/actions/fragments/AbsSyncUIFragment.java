@@ -25,6 +25,7 @@ import org.opendatakit.services.preferences.activities.IOdkAppPropertiesActivity
 import org.opendatakit.services.sync.actions.activities.AbsSyncBaseActivity;
 import org.opendatakit.services.sync.actions.activities.DoSyncActionCallback;
 import org.opendatakit.services.sync.actions.activities.ISyncServiceInterfaceActivity;
+import org.opendatakit.services.sync.actions.activities.LoginActivity;
 import org.opendatakit.services.sync.service.GlobalSyncNotificationManager;
 import org.opendatakit.services.utilities.ODKServicesPropertyUtils;
 import org.opendatakit.sync.service.IOdkSyncServiceInterface;
@@ -112,6 +113,24 @@ abstract class AbsSyncUIFragment extends Fragment implements
         uriField = view.findViewById(R.id.sync_uri_field);
         accountAuthType = view.findViewById(R.id.sync_account_auth_label);
         accountIdentity = view.findViewById(R.id.sync_account);
+
+        accountIdentity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(view.getContext(), LoginActivity.class);
+                i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, mAppName);
+                startActivity(i);
+            }
+        });
+
+        accountAuthType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(view.getContext(), LoginActivity.class);
+                i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, mAppName);
+                startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -128,7 +147,7 @@ abstract class AbsSyncUIFragment extends Fragment implements
             getActivity().setResult(Activity.RESULT_CANCELED);
             getActivity().finish();*/
             mAppName = ODKFileUtils.getOdkDefaultAppName();
-            return;
+            //return;
         }
 
         updateCredentialsUI();

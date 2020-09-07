@@ -10,7 +10,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-<!--        <LinearLayout
+       <LinearLayout
                 android:id="@+id/sync_info_pane"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
 
         </LinearLayout>
 
-        <Button
+ <!--       <Button
                 android:id="@+id/change_user_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

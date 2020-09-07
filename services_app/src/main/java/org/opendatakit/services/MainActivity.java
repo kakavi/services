@@ -17,6 +17,7 @@ package org.opendatakit.services;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,6 +26,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -114,7 +116,7 @@ public class MainActivity extends AbsSyncBaseActivity implements ISyncServiceInt
     mWorkManager = WorkManager.getInstance();
     startBackgroundJob();
 
-    launch(savedInstanceState);
+    launch();
 
     //firebase
     FirebaseInstanceId.getInstance().getInstanceId()
@@ -134,52 +136,31 @@ public class MainActivity extends AbsSyncBaseActivity implements ISyncServiceInt
                 Log.d(TAG, msg);
               }
             });
-  }
 
-  private void launch(Bundle savedInstanceState) {
-    mProps = CommonToolProperties.get(this, ODKFileUtils.getOdkDefaultAppName());
+    //code to hide app
+   /* PackageManager p = getPackageManager();
+    ComponentName componentName = new ComponentName(this, MainActivity.class);
+    p.setComponentEnabledSetting(componentName,PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);*/
 
-    if (savedInstanceState == null) {
-      FragmentManager mgr = getSupportFragmentManager();
-      Fragment newFragment = new SyncFragment();
-      FragmentTransaction ft = mgr.beginTransaction();
-      ft.add(R.id.sync_activity_view, newFragment).commit();
-    }
-
-    boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
-    if (isFirstLaunch) {
-      // set first launch to false
-      mProps.setProperties(Collections.singletonMap(CommonToolProperties
-              .KEY_FIRST_LAUNCH, "false"));
-      AlertDialog.Builder builder = new AlertDialog.Builder(this);
-      mDialog = builder.setMessage(R.string.configure_server_settings)
-              .setCancelable(false)
-              .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                @Override public void onClick(DialogInterface dialog, int which) {
-                  mDialog.dismiss();
-
-                  getSupportFragmentManager()
-                          .beginTransaction()
-                          .replace(R.id.sync_activity_view, new ServerSettingsFragment())
-                          .addToBackStack(null)
-                          .commit();
-                }
-              })
-              .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                @Override public void onClick(DialogInterface dialog, int which) {
-                  dialog.dismiss();
-                }
-              }).create();
-      mDialog.setCanceledOnTouchOutside(false);
-      mDialog.show();
-    }
+    //show app
+    PackageManager p = getPackageManager();
+    ComponentName componentName = new ComponentName(this, MainActivity.class);
+    p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
   }
 
   @Override
   protected void onResume() {
     super.onResume();
+    launch();
+  }
 
-    //check if apps installed
+  private void launch() {
+
+    appName = getIntent().getStringExtra(IntentConsts.INTENT_KEY_APP_NAME);
+    if (appName == null) {
+      appName = ODKFileUtils.getOdkDefaultAppName();
+    }
+
     //check if apps installed
     boolean isIOInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.openintents.filemanager", this.getPackageManager());
     boolean isSurveyInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.survey", this.getPackageManager());
@@ -189,17 +170,9 @@ public class MainActivity extends AbsSyncBaseActivity implements ISyncServiceInt
       //installed
     } else {
       Toast.makeText(this, "Please install app to continue", Toast.LENGTH_SHORT).show();
-      Intent intent = new Intent(this, VerifyServerSettingsActivity.class);
-      startActivity(intent);
-    }
-
-    appName = getIntent().getStringExtra(IntentConsts.INTENT_KEY_APP_NAME);
-    if (appName == null) {
-      appName = ODKFileUtils.getOdkDefaultAppName();
-      /*Log.e(TAG, IntentConsts.INTENT_KEY_APP_NAME + " not supplied on intent");
-      setResult(Activity.RESULT_CANCELED);
-      finish();*/
-      return;
+      Intent i = new Intent(this, VerifyServerSettingsActivity.class);
+      i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, appName);
+      startActivity(i);
     }
 
     firstLaunch();
@@ -295,7 +268,7 @@ public class MainActivity extends AbsSyncBaseActivity implements ISyncServiceInt
 
   @Override
   public String getAppName() {
-    return mAppName;
+    return appName;
   }
 
   @Override
@@ -385,7 +358,7 @@ public class MainActivity extends AbsSyncBaseActivity implements ISyncServiceInt
   }
 
   private void firstLaunch() {
-     mProps = CommonToolProperties.get(this, mAppName);
+     mProps = CommonToolProperties.get(this, appName);
 
     boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
     if (isFirstLaunch) {
