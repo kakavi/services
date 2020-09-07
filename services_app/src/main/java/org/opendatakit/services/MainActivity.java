@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.Menu;
@@ -59,10 +60,11 @@ import org.opendatakit.utilities.RuntimePermissionUtils;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AbsSyncBaseActivity implements ISyncServiceInterfaceActivity, IAppAwareActivity,
+public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivity,
     ActivityCompat.OnRequestPermissionsResultCallback {
 
   private AlertDialog mDialog;
+  final Handler handler = new Handler();
 
   // Used for logging
   @SuppressWarnings("unused") private static final String TAG = MainActivity.class.getSimpleName();
@@ -339,22 +341,17 @@ public class MainActivity extends AbsSyncBaseActivity implements ISyncServiceInt
                       throws RemoteException {
                 if (syncServiceInterface != null) {
                     syncServiceInterface.synchronizeWithServer(getAppName(), syncAttachmentState);
+                } else {
+                  WebLogger.getLogger(getAppName()).w(TAG, "[postTaskToAccessSyncService] syncServiceInterface == null");
+                  // The service is not bound yet so now we need to try again
+                  handler.postDelayed(new Runnable() {
+                    @Override public void run() {
+                      performSync(SyncAttachmentState.NONE);
+                    }
+                  }, 100);
                 }
               }
             });
-  }
-
-  @Override
-  public void invokeSyncInterfaceAction(DoSyncActionCallback callback) {
-
-    if (callback != null) {
-      try {
-        callback.doAction(iOdkSyncServiceInterface);
-      } catch (RemoteException e) {
-        e.printStackTrace();
-      }
-    }
-
   }
 
   private void firstLaunch() {

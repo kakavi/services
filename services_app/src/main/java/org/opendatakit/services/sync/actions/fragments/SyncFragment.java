@@ -228,8 +228,7 @@ public class SyncFragment extends AbsSyncUIFragment {
     }
 
     String url = props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL);
-    Toast.makeText(getActivity(),url,
-            Toast.LENGTH_LONG).show();
+
     if (url == null || url.length() == 0) {
       disableButtons();
     } else {
