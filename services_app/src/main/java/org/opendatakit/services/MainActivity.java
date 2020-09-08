@@ -17,6 +17,7 @@ package org.opendatakit.services;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,6 +42,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import org.opendatakit.activities.IAppAwareActivity;
 import org.opendatakit.consts.IntentConsts;
+import org.opendatakit.consts.RequestCodeConsts;
 import org.opendatakit.logging.WebLogger;
 import org.opendatakit.properties.CommonToolProperties;
 import org.opendatakit.properties.PropertiesSingleton;
@@ -138,16 +140,6 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
                 Log.d(TAG, msg);
               }
             });
-
-    //code to hide app
-   /* PackageManager p = getPackageManager();
-    ComponentName componentName = new ComponentName(this, MainActivity.class);
-    p.setComponentEnabledSetting(componentName,PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);*/
-
-    //show app
-    PackageManager p = getPackageManager();
-    ComponentName componentName = new ComponentName(this, MainActivity.class);
-    p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
   }
 
   @Override
@@ -170,7 +162,17 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
 
     if(isIOInstalled || isSurveyInstalled || isTablesInstalled) {
       //installed
+      //hide app
+/*      PackageManager p = getPackageManager();
+      p.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);*/
+
     } else {
+      //not installed
+      //show app
+/*      PackageManager p = getPackageManager();
+      ComponentName componentName = new ComponentName(this, MainActivity.class);
+      p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);*/
+
       Toast.makeText(this, "Please install app to continue", Toast.LENGTH_SHORT).show();
       Intent i = new Intent(this, VerifyServerSettingsActivity.class);
       i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, appName);
@@ -212,6 +214,24 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
     // automatically handle clicks on the Home/Up button, so long
     // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
+
+    if (id == R.id.menu_table_home) {
+
+      try {
+        Intent intent = new Intent();
+        intent.setComponent(
+                new ComponentName("org.opendatakit.tables", "org.opendatakit.tables.activities.Launcher"));
+        intent.setAction(Intent.ACTION_DEFAULT);
+        Bundle bundle = new Bundle();
+        bundle.putString(IntentConsts.INTENT_KEY_APP_NAME, appName);
+        intent.putExtras(bundle);
+        this.startActivityForResult(intent, RequestCodeConsts.RequestCodes.LAUNCH_SYNC);
+      } catch (ActivityNotFoundException e) {
+        WebLogger.getLogger(appName).printStackTrace(e);
+        Toast.makeText(this, "Everflow is not installed", Toast.LENGTH_LONG).show();
+      }
+      return true;
+    }
 
    /* if (id == R.id.action_sync) {
       Intent i = new Intent(this, SyncActivity.class);

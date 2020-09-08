@@ -16,12 +16,15 @@
 package org.opendatakit.services.resolve.conflict;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -29,6 +32,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import org.opendatakit.activities.IAppAwareActivity;
 import org.opendatakit.consts.IntentConsts;
+import org.opendatakit.consts.RequestCodeConsts;
 import org.opendatakit.fragment.AboutMenuFragment;
 import org.opendatakit.logging.WebLogger;
 import org.opendatakit.services.R;
@@ -143,6 +147,25 @@ public class ConflictResolutionActivity extends AppCompatActivity implements IAp
     if (id == R.id.action_verify_server_settings) {
       return true;
     }*/
+
+    if (id == R.id.menu_table_home) {
+
+      try {
+        Intent intent = new Intent();
+        intent.setComponent(
+                new ComponentName("org.opendatakit.tables", "org.opendatakit.tables.activities.Launcher"));
+        intent.setAction(Intent.ACTION_DEFAULT);
+        Bundle bundle = new Bundle();
+        bundle.putString(IntentConsts.INTENT_KEY_APP_NAME, mAppName);
+        intent.putExtras(bundle);
+        this.startActivityForResult(intent, RequestCodeConsts.RequestCodes.LAUNCH_SYNC);
+      } catch (ActivityNotFoundException e) {
+        WebLogger.getLogger(mAppName).printStackTrace(e);
+        Toast.makeText(this, "Everflow is not installed", Toast.LENGTH_LONG).show();
+      }
+      return true;
+    }
+
     if (id == R.id.action_resolve_conflict) {
       return true;
     }
