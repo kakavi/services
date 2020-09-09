@@ -354,9 +354,11 @@
     <string name="admin_change_splash_settings">Change Splash Screen settings</string>
     <string name="splash_media_save_failed">Unable to copy selected splash screen image</string>
 
+    <string name="tool_open_file_manager">Open File Manager</string>
     <string name="tool_tables_settings">Tables-specific Settings</string>
     <string name="tool_tables_restrictions_apply">Tables-specific settings (non-Admin restrictions apply)</string>
     <string name="tool_tables_settings_summary">ODK-X Tables-specific settings</string>
+    <string name="tool_open_file_manager_summary">View files under opendatakit folder</string>
     <string name="custom_home_screen">Use custom home screen</string>
     <string name="admin_tool_tables_settings">Manage ability to change Tables-specific Settings</string>
     <string name="admin_tool_tables_settings_summary">Limit non-Admin ability to change Tables-specific Settings</string>
