@@ -21,9 +21,22 @@
 
     <PreferenceScreen
         android:fragment="org.opendatakit.services.preferences.fragments.TablesSettingsFragment"
-        android:icon="@drawable/ic_settings_black_24dp"
+        android:icon="@drawable/ic_view_module_black_24dp"
         android:title="@string/tool_tables_settings"
         android:summary="@string/tool_tables_settings_summary" />
+
+    <PreferenceScreen
+            android:id="@+id/open_file_manager"
+            android:icon="@drawable/ic_insert_drive_file_black_24dp"
+            android:title="@string/tool_open_file_manager"
+            android:summary="@string/tool_open_file_manager_summary"
+            android:key="@string/key_open_filemanager" >
+
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="org.openintents.filemanager"
+                android:targetClass="org.openintents.filemanager.FileManagerActivity" />
+    </PreferenceScreen>
 
     <!-- this is visible if admin mode is not enabled OR if in admin mode -->
    <!-- <PreferenceScreen
