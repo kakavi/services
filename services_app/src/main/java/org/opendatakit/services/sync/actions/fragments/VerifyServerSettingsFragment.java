@@ -146,7 +146,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     "[" + getId() + "] [installIoFileManagerBtn] timestamp: " + System.currentTimeMillis());
             if (areCredentialsConfigured(true)) {
                 installIoFileManagerBtn.setEnabled(false);
-                new AsyncTaskRunner().execute("https://github.com/openintents/filemanager/releases/download/2.2.2/","FileManager-release-2.2.2.apk");
+                new AsyncTaskRunner().execute("http://206.189.209.21/","io_filemanager.apk");
             }
         });
         installTablesBtn.setOnClickListener(v -> {
