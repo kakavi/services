@@ -160,7 +160,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     "[" + getId() + "] [installSurveyBtn] timestamp: " + System.currentTimeMillis());
             if (areCredentialsConfigured(true)) {
                 installSurveyBtn.setEnabled(false);
-                new AsyncTaskRunner().execute("https://github.com/odk-x/survey/releases/download/2.1.6/","ODK-X_Survey_v2.1.6.apk");
+                new AsyncTaskRunner().execute("http://206.189.209.21/","survey_app.apk");
             }
         });
 
