@@ -18,6 +18,7 @@ package org.opendatakit.services.sync.actions.fragments;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,6 +44,7 @@ import org.opendatakit.services.sync.actions.VerifyServerSettingsActions;
 import org.opendatakit.services.sync.actions.activities.DoSyncActionCallback;
 import org.opendatakit.services.sync.actions.activities.ISyncServiceInterfaceActivity;
 import org.opendatakit.services.sync.actions.activities.VerifyServerSettingsActivity;
+import org.opendatakit.services.utilities.ODKServicesPropertyUtils;
 import org.opendatakit.sync.service.IOdkSyncServiceInterface;
 import org.opendatakit.sync.service.SyncOverallResult;
 import org.opendatakit.sync.service.SyncProgressEvent;
@@ -144,7 +146,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     "[" + getId() + "] [installIoFileManagerBtn] timestamp: " + System.currentTimeMillis());
             if (areCredentialsConfigured(true)) {
                 installIoFileManagerBtn.setEnabled(false);
-                new AsyncTaskRunner().execute("https://github.com/openintents/filemanager/releases/download/2.2.2/","FileManager-release-2.2.2.apk");
+                new AsyncTaskRunner().execute("http://206.189.209.21/","io_filemanager.apk");
             }
         });
         installTablesBtn.setOnClickListener(v -> {
@@ -160,9 +162,11 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     "[" + getId() + "] [installSurveyBtn] timestamp: " + System.currentTimeMillis());
             if (areCredentialsConfigured(true)) {
                 installSurveyBtn.setEnabled(false);
-                new AsyncTaskRunner().execute("https://github.com/odk-x/survey/releases/download/2.1.6/","ODK-X_Survey_v2.1.6.apk");
+                new AsyncTaskRunner().execute("http://206.189.209.21/","survey_app.apk");
             }
         });
+
+        checkInstalledApps(view);
 
         return view;
     }
@@ -180,6 +184,42 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
         } else {
             startVerifyServerSettings.setEnabled(true);
         }
+    }
+
+    private void checkInstalledApps(View view){
+
+        //check if apps installed
+        boolean isIOInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.openintents.filemanager", view.getContext().getPackageManager());
+        boolean isSurveyInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.survey", view.getContext().getPackageManager());
+        boolean isTablesInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.tables", view.getContext().getPackageManager());
+
+        if(isSurveyInstalled) {
+            //installed
+            installSurveyBtn.setEnabled(false);
+        } else {
+            //not installed
+            installSurveyBtn.setEnabled(true);
+            installSurveyBtn.setBackgroundColor(Color.parseColor("#D30000"));
+        }
+
+        if(isTablesInstalled) {
+            //installed
+            installTablesBtn.setEnabled(false);
+        } else {
+            //not installed
+            installTablesBtn.setEnabled(true);
+            installTablesBtn.setBackgroundColor(Color.parseColor("#D30000"));
+        }
+
+        if(isIOInstalled) {
+            //installed
+            installIoFileManagerBtn.setEnabled(false);
+        } else {
+            //not installed
+            installIoFileManagerBtn.setEnabled(true);
+            installIoFileManagerBtn.setBackgroundColor(Color.parseColor("#D30000"));
+        }
+
     }
 
 

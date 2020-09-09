@@ -109,7 +109,7 @@ public class CheckpointResolutionActivity extends AppCompatActivity implements I
     trans.replace(R.id.checkpoint_resolver_activity_view, newFragment, newFragmentName);
     trans.commit();
   }
-  
+
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
@@ -124,7 +124,7 @@ public class CheckpointResolutionActivity extends AppCompatActivity implements I
 
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
-    menu.findItem(R.id.action_sync).setVisible(false);
+    //menu.findItem(R.id.action_sync).setVisible(false);
     menu.findItem(R.id.action_change_user).setVisible(false);
     return super.onPrepareOptionsMenu(menu);
   }
@@ -135,7 +135,7 @@ public class CheckpointResolutionActivity extends AppCompatActivity implements I
     // automatically handle clicks on the Home/Up button, so long
     // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
-    if (id == R.id.action_sync) {
+/*    if (id == R.id.action_sync) {
       return true;
     }
     if (id == R.id.action_about) {
@@ -151,7 +151,7 @@ public class CheckpointResolutionActivity extends AppCompatActivity implements I
       trans.commit();
 
       return true;
-    }
+    }*/
     return super.onOptionsItemSelected(item);
   }
 
