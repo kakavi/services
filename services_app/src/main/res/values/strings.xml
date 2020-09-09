@@ -184,7 +184,7 @@
 
     <!-- Sync User Interface stuff -->
     <string name="sync_details">Sync Configuration:</string>
-    <string name="sync_server_url">Server URL</string>
+    <string name="sync_server_url">Server URL:</string>
     <string name="sync_default_server_url">http://161.35.38.163</string>
     <string name="sync_account">Account:</string>
     <string name="sync_progress_state_label">Sync Progress State</string>
@@ -216,15 +216,15 @@
         Please update your settings.</string>
 
     <string name="verify_server_settings_start">Verify User Permissions</string>
-    <string name="install_tables_label">Install Tables</string>
-    <string name="install_forms_label">Install Survey</string>
-    <string name="install_IO_label">Install IO</string>
+    <string name="install_tables_label">Install Everflow</string>
+    <string name="install_forms_label">Install Kenga Survey</string>
+    <string name="install_IO_label">Install IO File Manager</string>
     <string name="verify_server_settings_starting">Starting fetch of user permissions&#8230;</string>
     <string name="verifying_server_settings">Verifying User Permissions&#8230;</string>
     <string name="verify_server_setttings_successful">Verification successful</string>
     <string name="verify_server_setttings_successful_text">Success! User permissions have been updated.</string>
-    <string name="verify_server_settings_header">Verify User Permissions</string>
-    <string name="click_to_verify_server_settings">Click to Verify User Permissions</string>
+    <string name="verify_server_settings_header">Install Support Apps</string>
+    <string name="click_to_verify_server_settings">Click to check/install support apps</string>
     <string name="warning_no_user_roles">Warning: User permissions have not been verified!\nRunning with reduced privileges.</string>
     <!-- sync service layer messages -->
     <string name="sync_notification_syncing">"Kenga Sync In Progress %1$s</string>
@@ -319,7 +319,7 @@
     <string name="change_credential">Change Sign-on Credential</string>
 
     <string name="username_password">Username and/or Password</string>
-    <string name="username">Username</string>
+    <string name="username">Username:</string>
     <string name="change_username">ODK-X Username</string>
     <string name="password">Server Password</string>
     <string name="change_server_password">Server Password</string>
@@ -354,9 +354,11 @@
     <string name="admin_change_splash_settings">Change Splash Screen settings</string>
     <string name="splash_media_save_failed">Unable to copy selected splash screen image</string>
 
+    <string name="tool_open_file_manager">Open File Manager</string>
     <string name="tool_tables_settings">Tables-specific Settings</string>
     <string name="tool_tables_restrictions_apply">Tables-specific settings (non-Admin restrictions apply)</string>
     <string name="tool_tables_settings_summary">ODK-X Tables-specific settings</string>
+    <string name="tool_open_file_manager_summary">View files under opendatakit folder</string>
     <string name="custom_home_screen">Use custom home screen</string>
     <string name="admin_tool_tables_settings">Manage ability to change Tables-specific Settings</string>
     <string name="admin_tool_tables_settings_summary">Limit non-Admin ability to change Tables-specific Settings</string>
@@ -383,4 +385,5 @@
     <string name="not_now">Not now</string>
     <string name="no">No</string>
     <string name="configure_server_settings">Do you want to configure the server settings now?</string>
+    <string name="home">Home</string>
 </resources>

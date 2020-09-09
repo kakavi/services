@@ -28,9 +28,9 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import org.opendatakit.consts.IntentConsts;
+import org.opendatakit.services.MainActivity;
 import org.opendatakit.services.R;
 import org.opendatakit.services.resolve.conflict.AllConflictsResolutionActivity;
-import org.opendatakit.services.sync.actions.activities.SyncActivity;
 import org.opendatakit.services.sync.actions.activities.VerifyServerSettingsActivity;
 import org.opendatakit.services.sync.service.exceptions.NoAppNameSpecifiedException;
 
@@ -125,9 +125,9 @@ public final class GlobalSyncNotificationManagerImpl implements GlobalSyncNotifi
 
   private void createNotification(String appName) {
     // The intent to launch when the user clicks the expanded notification
-    // Intent tmpIntent = new Intent(service, SyncActivity.class);
+    // Intent tmpIntent = new Intent(service, MainActivity.class);
     Intent tmpIntent = new Intent(Intent.ACTION_VIEW);
-    tmpIntent.setClassName("org.opendatakit.sync", "org.opendatakit.services.sync.actions.activities.SyncActivity");
+    tmpIntent.setClassName("org.opendatakit.sync", "org.opendatakit.services.MainActivity");
     tmpIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     PendingIntent pendIntent = PendingIntent.getActivity(service.getApplicationContext(), 0,
         tmpIntent, 0);
@@ -283,7 +283,7 @@ public final class GlobalSyncNotificationManagerImpl implements GlobalSyncNotifi
 
   @NonNull private PendingIntent createPendingIntentForSyncActivity(String appName) {
     // setup the launch sync activity pending intent
-    Intent i = new Intent(service, SyncActivity.class);
+    Intent i = new Intent(service, MainActivity.class);
     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
         Intent.FLAG_FROM_BACKGROUND);
     i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, appName);

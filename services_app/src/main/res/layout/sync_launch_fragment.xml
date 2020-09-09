@@ -10,7 +10,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <LinearLayout
+       <LinearLayout
                 android:id="@+id/sync_info_pane"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -24,6 +24,7 @@
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="5dp"
                     android:textSize="20sp"
+                    android:textStyle="bold"
                     android:text="@string/sync_server_url"/>
 
             <TextView
@@ -35,6 +36,11 @@
                     android:layout_marginTop="5dp"
                     android:textSize="17sp"/>
 
+           <FrameLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:foreground="?attr/selectableItemBackground">
+
             <TextView
                     android:id="@+id/sync_account_auth_label"
                     android:layout_width="wrap_content"
@@ -42,22 +48,25 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="5dp"
+                    android:textStyle="bold"
+                    android:labelFor="@+id/sync_account"
                     android:textSize="20sp"
                     android:text="@string/username"/>
 
             <TextView
                     android:id="@+id/sync_account"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:layout_marginTop="5dp"
-                    android:textSize="17sp"
-                    android:textStyle="bold"/>
+                    android:layout_marginTop="40dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:textSize="17sp"/>
+           </FrameLayout>
 
         </LinearLayout>
 
-        <Button
+ <!--       <Button
                 android:id="@+id/change_user_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,19 +74,26 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginEnd="20dp"
-                android:text="@string/change_user"/>
+                android:text="@string/change_user"/>-->
 
-        <Space
+        <View
                 android:layout_width="match_parent"
                 android:layout_height="40dp"/>
 
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/border">
+
         <Spinner
                 android:id="@+id/sync_instance_attachments"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                style="@style/Widget.AppCompat.Spinner"
         />
+        </FrameLayout>
 
         <Button
                 android:id="@+id/sync_start_button"
@@ -88,6 +104,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginTop="10dp"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:text="@string/sync_start"/>
 
         <!-- TODO: Hiding these until we settle on a new Sync UI. For now its just the
@@ -139,6 +156,8 @@
                     android:id="@+id/sync_reset_server_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/Widget.AppCompat.Button"
+                    android:padding="15dp"
                     android:text="@string/sync_reset_server"/>
         </LinearLayout>
     </LinearLayout>

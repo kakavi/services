@@ -25,11 +25,13 @@ import org.opendatakit.services.preferences.activities.IOdkAppPropertiesActivity
 import org.opendatakit.services.sync.actions.activities.AbsSyncBaseActivity;
 import org.opendatakit.services.sync.actions.activities.DoSyncActionCallback;
 import org.opendatakit.services.sync.actions.activities.ISyncServiceInterfaceActivity;
+import org.opendatakit.services.sync.actions.activities.LoginActivity;
 import org.opendatakit.services.sync.service.GlobalSyncNotificationManager;
 import org.opendatakit.services.utilities.ODKServicesPropertyUtils;
 import org.opendatakit.sync.service.IOdkSyncServiceInterface;
 import org.opendatakit.sync.service.SyncStatus;
 import org.opendatakit.utilities.AppNameUtil;
+import org.opendatakit.utilities.ODKFileUtils;
 
 /**
  * Created by wrb on 2/5/2018.
@@ -83,6 +85,10 @@ abstract class AbsSyncUIFragment extends Fragment implements
             mAppName = AppNameUtil.getAppNameFromActivity(getActivity());
         }
 
+        if (mAppName == null) {
+            mAppName = ODKFileUtils.getOdkDefaultAppName();
+        }
+
         if (savedInstanceState != null) {
             msgManager = AlertNProgessMsgFragmentMger
                     .restoreInitMessaging(getAppName(), alertDialogTag, progressDialogTag,
@@ -107,6 +113,24 @@ abstract class AbsSyncUIFragment extends Fragment implements
         uriField = view.findViewById(R.id.sync_uri_field);
         accountAuthType = view.findViewById(R.id.sync_account_auth_label);
         accountIdentity = view.findViewById(R.id.sync_account);
+
+        accountIdentity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(view.getContext(), LoginActivity.class);
+                i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, mAppName);
+                startActivity(i);
+            }
+        });
+
+        accountAuthType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(view.getContext(), LoginActivity.class);
+                i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, mAppName);
+                startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -117,12 +141,13 @@ abstract class AbsSyncUIFragment extends Fragment implements
         Intent incomingIntent = getActivity().getIntent();
         String tmpAppName = incomingIntent.getStringExtra(IntentConsts.INTENT_KEY_APP_NAME);
         if ( mAppName == null || mAppName.length() == 0 || !mAppName.equals(tmpAppName)) {
-            WebLogger.getLogger(getAppName()).i(TAG, "[" + getId() + "] [onResume] appName is "
+            /*WebLogger.getLogger(getAppName()).i(TAG, "[" + getId() + "] [onResume] appName is "
                     + "either null or does not match the current appName of the activity so calling "
                     + "finish");
             getActivity().setResult(Activity.RESULT_CANCELED);
-            getActivity().finish();
-            return;
+            getActivity().finish();*/
+            mAppName = ODKFileUtils.getOdkDefaultAppName();
+            //return;
         }
 
         updateCredentialsUI();
@@ -192,7 +217,7 @@ abstract class AbsSyncUIFragment extends Fragment implements
 
     public boolean areCredentialsConfigured(boolean createError) {
         // verify that we have the necessary credentials
-        PropertiesSingleton props = CommonToolProperties.get(getActivity(), getAppName());
+        PropertiesSingleton props = CommonToolProperties.get(getActivity(), /*getAppName()*/ODKFileUtils.getOdkDefaultAppName());
         String authType = props.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
         if (getString(R.string.credential_type_none).equals(authType)) {
             return true;
@@ -200,8 +225,10 @@ abstract class AbsSyncUIFragment extends Fragment implements
         if (getString(R.string.credential_type_username_password).equals(authType)) {
             String username = props.getProperty(CommonToolProperties.KEY_USERNAME);
             String password = props.getProperty(CommonToolProperties.KEY_PASSWORD);
-            if (username == null || username.length() == 0 || password == null
-                    || password.length() == 0) {
+
+            if (!username.isEmpty() && !password.isEmpty()) {
+                return true;
+            } else {
                 if(createError) {
                     AbsSyncBaseActivity.showAuthenticationErrorDialog(getActivity(), getString(R.string.sync_configure_username_password));
                 } else {
@@ -210,7 +237,6 @@ abstract class AbsSyncUIFragment extends Fragment implements
                 }
                 return false;
             }
-            return true;
         }
         if(createError) {
             AbsSyncBaseActivity.showAuthenticationErrorDialog(getActivity(), getString(R.string.sync_configure_credentials));

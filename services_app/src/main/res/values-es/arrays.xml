@@ -11,15 +11,15 @@
     <!-- must map to SyncAttachmentState enum names -->
     <string-array tools:ignore="MissingTranslation"
                   name="sync_attachment_option_values">
+        <item>NONE</item>
         <item>SYNC</item>
         <item>UPLOAD</item>
         <item>DOWNLOAD</item>
-        <item>NONE</item>
     </string-array>
     <string-array name="sync_attachment_option_names">
+        <item>No sincronizar archivos</item>
         <item>Sincronizar Todos</item>
         <item>Solo enviar archivos (imágenes, audio, video) al servidor</item>
         <item>Solo recibir archivos (imágenes, audio, video) del servidor</item>
-        <item>No sincronizar archivos</item>
     </string-array>
 </resources>
