@@ -23,6 +23,12 @@
           android:title="@string/home"
           app:showAsAction="always" />
 
+  <item
+          android:id="@+id/menu_table_manager_sync"
+          android:icon="@drawable/ic_cached_black_24dp"
+          android:title="@string/sync"
+          app:showAsAction="always" />
+
     <item
         android:id="@+id/action_resolve_conflict"
         android:orderInCategory="30"

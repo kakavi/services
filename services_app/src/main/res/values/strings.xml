@@ -386,4 +386,5 @@
     <string name="no">No</string>
     <string name="configure_server_settings">Do you want to configure the server settings now?</string>
     <string name="home">Home</string>
+    <string name="sync">Sync</string>
 </resources>
