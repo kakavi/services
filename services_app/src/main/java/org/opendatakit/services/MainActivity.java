@@ -22,15 +22,19 @@ import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -96,6 +100,7 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
     WebLogger.closeAll();
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.O)
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -120,7 +125,7 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
     mWorkManager = WorkManager.getInstance();
     startBackgroundJob();
 
-    launch();
+    doThis();
 
     //firebase
     FirebaseInstanceId.getInstance().getInstanceId()
@@ -142,10 +147,36 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
             });
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.O)
+  private void doThis() {
+    if(!getPackageManager().canRequestPackageInstalls()){
+      Toast.makeText(this, "Please allow Kenga Services to install from unknown sources", Toast.LENGTH_SHORT).show();
+
+      new Handler().postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:org.opendatakit.services")));
+        }
+      }, 2000);
+
+    }
+
+    try{
+      boolean isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
+      if (!isNonPlayAppAllowed) {
+        startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
+      }
+      launch();
+    } catch (Exception e){
+      e.printStackTrace();
+    }
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.O)
   @Override
   protected void onResume() {
     super.onResume();
-    launch();
+    doThis();
   }
 
   private void launch() {
@@ -181,6 +212,7 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
 
     firstLaunch();
     WebLogger.getLogger(getAppName()).i(TAG, "[onResume] getting SyncFragment");
+
 
     FragmentManager mgr = getSupportFragmentManager();
     String newFragmentName;
@@ -246,6 +278,18 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
       startActivityForResult(i, VERIFY_SERVER_SETTINGS_ACTIVITY_RESULT_CODE);
       return true;
     }*/
+
+      if (id == R.id.menu_table_manager_sync) {
+              Intent syncIntent = new Intent();
+              syncIntent.setComponent(
+                      new ComponentName(IntentConsts.Sync.APPLICATION_NAME, "org.opendatakit.services.MainActivity"));
+              syncIntent.setAction(Intent.ACTION_DEFAULT);
+              Bundle bundle = new Bundle();
+              bundle.putString(IntentConsts.INTENT_KEY_APP_NAME, appName);
+              syncIntent.putExtras(bundle);
+              this.startActivityForResult(syncIntent, RequestCodeConsts.RequestCodes.LAUNCH_SYNC);
+          return true;
+      }
 
     if (id == R.id.action_resolve_conflict) {
       Intent i = new Intent(this, AllConflictsResolutionActivity.class);
@@ -375,7 +419,7 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   }
 
   private void firstLaunch() {
-     mProps = CommonToolProperties.get(this, appName);
+    mProps = CommonToolProperties.get(this, appName);
 
     boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
     if (isFirstLaunch) {

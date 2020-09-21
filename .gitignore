@@ -7,3 +7,4 @@ local.properties
 *.d
 services_app/fabric.properties
 odkanalytics/
+androidlibrary/

@@ -262,7 +262,7 @@ public class ServerSettingsFragment extends PreferenceFragmentCompat implements
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    inflater.inflate(R.menu.server_settings_action_menu, menu);
+    //inflater.inflate(R.menu.server_settings_action_menu, menu);
   }
 
   private void updatePropertiesSingleton(String key, String value){
@@ -373,7 +373,7 @@ public class ServerSettingsFragment extends PreferenceFragmentCompat implements
   public void updatePassword(String pw) {
     updatePropertiesSingleton(CommonToolProperties.KEY_PASSWORD, pw);
  }
-
+/*
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
@@ -393,7 +393,7 @@ public class ServerSettingsFragment extends PreferenceFragmentCompat implements
         return super.onOptionsItemSelected(item);
 
     }
-  }
+  }*/
 
   private void openBarcodeScanner() {
     IntentIntegrator

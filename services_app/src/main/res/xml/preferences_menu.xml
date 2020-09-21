@@ -38,6 +38,19 @@
                 android:targetClass="org.openintents.filemanager.FileManagerActivity" />
     </PreferenceScreen>
 
+    <PreferenceScreen
+            android:id="@+id/verify_server_settingss"
+            android:icon="@drawable/ic_verified_user_black_24dp"
+            android:title="@string/verify_server_settings_header"
+            android:summary="@string/click_to_verify_server_settings"
+            android:key="@string/key_verify_settings">
+
+        <intent
+                android:action="android.intent.action.EDIT"
+                android:targetPackage="org.opendatakit.services"
+                android:targetClass="org.opendatakit.services.sync.actions.activities.VerifyServerSettingsActivity" />
+    </PreferenceScreen>
+
     <!-- this is visible if admin mode is not enabled OR if in admin mode -->
    <!-- <PreferenceScreen
         android:id="@+id/admin_password_status"
@@ -87,18 +100,5 @@
             android:action="android.intent.action.EDIT"
             android:targetPackage="org.opendatakit.services"
             android:targetClass="org.opendatakit.services.preferences.activities.ClearAppPropertiesActivity" />
-    </PreferenceScreen>
-
-    <PreferenceScreen
-        android:id="@+id/verify_server_settingss"
-        android:icon="@drawable/ic_verified_user_black_24dp"
-        android:title="@string/verify_server_settings_header"
-        android:summary="@string/click_to_verify_server_settings"
-        android:key="@string/key_verify_settings">
-
-        <intent
-            android:action="android.intent.action.EDIT"
-            android:targetPackage="org.opendatakit.services"
-            android:targetClass="org.opendatakit.services.sync.actions.activities.VerifyServerSettingsActivity" />
     </PreferenceScreen>
 </PreferenceScreen>

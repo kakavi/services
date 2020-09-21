@@ -24,6 +24,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -178,11 +179,13 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
 
     void perhapsEnableButtons() {
         PropertiesSingleton props = ((IOdkAppPropertiesActivity) this.getActivity()).getProps();
-        String url = props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL);
-        if (url == null || url.length() == 0) {
-            disableButtons();
-        } else {
-            startVerifyServerSettings.setEnabled(true);
+        if(props != null) {
+            String url = props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL);
+            if (url == null || url.length() == 0) {
+                disableButtons();
+            } else {
+                startVerifyServerSettings.setEnabled(true);
+            }
         }
     }
 
@@ -501,12 +504,13 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
     private class AsyncTaskRunner extends AsyncTask<String, String, String> {
         String result = "";
         ProgressDialog progressDialog;
+
         @Override
-         protected String doInBackground(String... params) {
+        protected String doInBackground(String... params) {
             try {
                 String apkName = params[1];
                 String apkUrl = params[0];
-                URL url = new URL(apkUrl+""+apkName);
+                URL url = new URL(apkUrl + "" + apkName);
                 HttpURLConnection c = (HttpURLConnection) url
                         .openConnection();
                 c.setRequestMethod("GET");
@@ -529,27 +533,29 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                 }
                 fos.close();
                 is.close();
-                Intent intent = new Intent(Intent.ACTION_VIEW);
+                outputFile.setReadable(true, false);
+
+                Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                 intent.setDataAndType(FileProvider.getUriForFile(getActivity(), "org.opendatakit.services.GenericFileProvider",
                         new File(Environment.getExternalStorageDirectory() + "/download/" + apkName)), "application/vnd.android.package-archive");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
             } catch (Exception ex) {
-                result="Update error! "+ ex.getMessage();
+                result = "Update error! " + ex.getMessage();
                 ex.printStackTrace();
             }
             return result;
         }
 
         public void onPreExecute() {
-            progressDialog = ProgressDialog.show(getActivity(),"Downloading apk","Downloading apk");
+            progressDialog = ProgressDialog.show(getActivity(), "Downloading apk", "Downloading apk");
         }
 
         protected void onPostExecute(String result) {
             progressDialog.dismiss();
-            Toast.makeText(getActivity().getApplicationContext(), result,
-                    Toast.LENGTH_LONG).show();
+            Log.i("RESULT:", result);
+            //Toast.makeText(getActivity().getApplicationContext(), result, Toast.LENGTH_LONG).show();
         }
     }
 }
