@@ -33,6 +33,8 @@ import org.opendatakit.sync.service.SyncStatus;
 import org.opendatakit.utilities.AppNameUtil;
 import org.opendatakit.utilities.ODKFileUtils;
 
+import java.io.FileNotFoundException;
+
 /**
  * Created by wrb on 2/5/2018.
  */
@@ -217,26 +219,31 @@ abstract class AbsSyncUIFragment extends Fragment implements
 
     public boolean areCredentialsConfigured(boolean createError) {
         // verify that we have the necessary credentials
-        PropertiesSingleton props = CommonToolProperties.get(getActivity(), /*getAppName()*/ODKFileUtils.getOdkDefaultAppName());
-        String authType = props.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
-        if (getString(R.string.credential_type_none).equals(authType)) {
-            return true;
-        }
-        if (getString(R.string.credential_type_username_password).equals(authType)) {
-            String username = props.getProperty(CommonToolProperties.KEY_USERNAME);
-            String password = props.getProperty(CommonToolProperties.KEY_PASSWORD);
-
-            if (!username.isEmpty() && !password.isEmpty()) {
+        try {
+            PropertiesSingleton props = CommonToolProperties.get(getActivity(), /*getAppName()*/ODKFileUtils.getOdkDefaultAppName());
+            String authType = props.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
+            if (getString(R.string.credential_type_none).equals(authType)) {
                 return true;
-            } else {
-                if(createError) {
-                    AbsSyncBaseActivity.showAuthenticationErrorDialog(getActivity(), getString(R.string.sync_configure_username_password));
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.sync_configure_username_password),
-                            Toast.LENGTH_LONG).show();
-                }
-                return false;
             }
+            if (getString(R.string.credential_type_username_password).equals(authType)) {
+                String username = props.getProperty(CommonToolProperties.KEY_USERNAME);
+                String password = props.getProperty(CommonToolProperties.KEY_PASSWORD);
+
+                if (!username.isEmpty() && !password.isEmpty()) {
+                    return true;
+                } else {
+                    if (createError) {
+                        AbsSyncBaseActivity.showAuthenticationErrorDialog(getActivity(), getString(R.string.sync_configure_username_password));
+                    } else {
+                        Toast.makeText(getActivity(), getString(R.string.sync_configure_username_password),
+                                Toast.LENGTH_LONG).show();
+                    }
+                    return false;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            getActivity().finish();
         }
         if(createError) {
             AbsSyncBaseActivity.showAuthenticationErrorDialog(getActivity(), getString(R.string.sync_configure_credentials));
@@ -249,37 +256,39 @@ abstract class AbsSyncUIFragment extends Fragment implements
 
     void updateCredentialsUI() {
         PropertiesSingleton props = ((IOdkAppPropertiesActivity) this.getActivity()).getProps();
-        uriField.setText(props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL));
+        if(props != null) {
+            uriField.setText(props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL));
 
-        String credentialToUse = props.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
-        String[] credentialValues = getResources().getStringArray(R.array.credential_entry_values);
-        String[] credentialEntries = getResources().getStringArray(R.array.credential_entries);
+            String credentialToUse = props.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
+            String[] credentialValues = getResources().getStringArray(R.array.credential_entry_values);
+            String[] credentialEntries = getResources().getStringArray(R.array.credential_entries);
 
-        if ( credentialToUse == null ) {
-           // credentialToUse = getString(R.string.credential_type_none);
-            credentialToUse = getString(R.string.credential_type_username_password);
-        }
+            if (credentialToUse == null) {
+                // credentialToUse = getString(R.string.credential_type_none);
+                credentialToUse = getString(R.string.credential_type_username_password);
+            }
 
-        for ( int i = 0 ; i < credentialValues.length ; ++i ) {
-            if ( credentialToUse.equals(credentialValues[i]) ) {
-                if (!credentialToUse.equals(getString(R.string.credential_type_none))) {
-                    accountAuthType.setText(credentialEntries[i]);
+            for (int i = 0; i < credentialValues.length; ++i) {
+                if (credentialToUse.equals(credentialValues[i])) {
+                    if (!credentialToUse.equals(getString(R.string.credential_type_none))) {
+                        accountAuthType.setText(credentialEntries[i]);
+                    }
                 }
             }
-        }
 
-        String account = ODKServicesPropertyUtils.getActiveUser(props);
-        int indexOfColon = account.indexOf(':');
-        if (indexOfColon > 0) {
-            account = account.substring(indexOfColon + 1);
-        }
-        if ( credentialToUse.equals(getString(R.string.credential_type_none))) {
-            //accountIdentity.setText(getResources().getString(R.string.anonymous));
-            accountIdentity.setText(account);
-        } else if ( credentialToUse.equals(getString(R.string.credential_type_username_password))) {
-            accountIdentity.setText(account);
-        } else {
-            accountIdentity.setText(getResources().getString(R.string.no_account));
+            String account = ODKServicesPropertyUtils.getActiveUser(props);
+            int indexOfColon = account.indexOf(':');
+            if (indexOfColon > 0) {
+                account = account.substring(indexOfColon + 1);
+            }
+            if (credentialToUse.equals(getString(R.string.credential_type_none))) {
+                //accountIdentity.setText(getResources().getString(R.string.anonymous));
+                accountIdentity.setText(account);
+            } else if (credentialToUse.equals(getString(R.string.credential_type_username_password))) {
+                accountIdentity.setText(account);
+            } else {
+                accountIdentity.setText(getResources().getString(R.string.no_account));
+            }
         }
     }
 

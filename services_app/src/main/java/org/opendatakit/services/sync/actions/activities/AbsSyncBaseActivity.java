@@ -269,6 +269,18 @@ public abstract class AbsSyncBaseActivity extends AppCompatActivity
          return true;
       }*/
 
+      if (id == R.id.menu_table_manager_sync) {
+         Intent syncIntent = new Intent();
+         syncIntent.setComponent(
+                 new ComponentName(IntentConsts.Sync.APPLICATION_NAME, "org.opendatakit.services.MainActivity"));
+         syncIntent.setAction(Intent.ACTION_DEFAULT);
+         Bundle bundle = new Bundle();
+         bundle.putString(IntentConsts.INTENT_KEY_APP_NAME, getAppName());
+         syncIntent.putExtras(bundle);
+         this.startActivityForResult(syncIntent, RequestCodeConsts.RequestCodes.LAUNCH_SYNC);
+         return true;
+      }
+
       if (id == R.id.action_resolve_conflict) {
          Intent i = new Intent(this, AllConflictsResolutionActivity.class);
          i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, getAppName());
@@ -329,7 +341,11 @@ public abstract class AbsSyncBaseActivity extends AppCompatActivity
 
    @Override public PropertiesSingleton getProps() {
       if (mProps == null) {
-         mProps = CommonToolProperties.get(this, getAppName());
+         try {
+            mProps = CommonToolProperties.get(this, getAppName());
+         }catch(Exception e){
+            e.printStackTrace();
+         }
       }
       return mProps;
    }
