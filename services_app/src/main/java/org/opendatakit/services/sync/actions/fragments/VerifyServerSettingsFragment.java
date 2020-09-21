@@ -24,6 +24,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -553,8 +554,8 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
 
         protected void onPostExecute(String result) {
             progressDialog.dismiss();
-            Toast.makeText(getActivity().getApplicationContext(), result,
-                    Toast.LENGTH_LONG).show();
+            Log.i("RESULT:", result);
+            //Toast.makeText(getActivity().getApplicationContext(), result, Toast.LENGTH_LONG).show();
         }
     }
 }
