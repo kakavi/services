@@ -16,14 +16,16 @@
 package org.opendatakit.services.sync.actions.fragments;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.RemoteException;
+import android.os.*;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +33,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import android.widget.Toast;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import org.opendatakit.httpclientandroidlib.HttpResponse;
 import org.opendatakit.httpclientandroidlib.client.HttpClient;
@@ -39,6 +44,7 @@ import org.opendatakit.logging.WebLogger;
 import org.opendatakit.properties.CommonToolProperties;
 import org.opendatakit.properties.PropertiesSingleton;
 import org.opendatakit.services.BuildConfig;
+import org.opendatakit.services.Manifest;
 import org.opendatakit.services.R;
 import org.opendatakit.services.preferences.activities.IOdkAppPropertiesActivity;
 import org.opendatakit.services.sync.actions.VerifyServerSettingsActions;
@@ -147,7 +153,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     "[" + getId() + "] [installIoFileManagerBtn] timestamp: " + System.currentTimeMillis());
             if (areCredentialsConfigured(true)) {
                 installIoFileManagerBtn.setEnabled(false);
-                new AsyncTaskRunner().execute("http://206.189.209.21/","io_filemanager.apk");
+                downloadApk("http://206.189.209.21/", "io_filemanager.apk");
             }
         });
         installTablesBtn.setOnClickListener(v -> {
@@ -155,7 +161,8 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     "[" + getId() + "] [installTablesBtn] timestamp: " + System.currentTimeMillis());
             if (areCredentialsConfigured(true)) {
                 installTablesBtn.setEnabled(false);
-                new AsyncTaskRunner().execute("http://206.189.209.21/","tables_app.apk");
+//                new AsyncTaskRunner().execute("http://206.189.209.21/", "tables_app.apk");
+                downloadApk("http://206.189.209.21/", "tables_app.apk");
             }
         });
         installSurveyBtn.setOnClickListener(v -> {
@@ -163,7 +170,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     "[" + getId() + "] [installSurveyBtn] timestamp: " + System.currentTimeMillis());
             if (areCredentialsConfigured(true)) {
                 installSurveyBtn.setEnabled(false);
-                new AsyncTaskRunner().execute("http://206.189.209.21/","survey_app.apk");
+                downloadApk("http://206.189.209.21/", "survey_app.apk");
             }
         });
 
@@ -179,7 +186,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
 
     void perhapsEnableButtons() {
         PropertiesSingleton props = ((IOdkAppPropertiesActivity) this.getActivity()).getProps();
-        if(props != null) {
+        if (props != null) {
             String url = props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL);
             if (url == null || url.length() == 0) {
                 disableButtons();
@@ -189,14 +196,14 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
         }
     }
 
-    private void checkInstalledApps(View view){
+    private void checkInstalledApps(View view) {
 
         //check if apps installed
         boolean isIOInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.openintents.filemanager", view.getContext().getPackageManager());
         boolean isSurveyInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.survey", view.getContext().getPackageManager());
         boolean isTablesInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.tables", view.getContext().getPackageManager());
 
-        if(isSurveyInstalled) {
+        if (isSurveyInstalled) {
             //installed
             installSurveyBtn.setEnabled(false);
         } else {
@@ -205,7 +212,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
             installSurveyBtn.setBackgroundColor(Color.parseColor("#D30000"));
         }
 
-        if(isTablesInstalled) {
+        if (isTablesInstalled) {
             //installed
             installTablesBtn.setEnabled(false);
         } else {
@@ -214,7 +221,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
             installTablesBtn.setBackgroundColor(Color.parseColor("#D30000"));
         }
 
-        if(isIOInstalled) {
+        if (isIOInstalled) {
             //installed
             installIoFileManagerBtn.setEnabled(false);
         } else {
@@ -501,61 +508,59 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
         }
     }
 
-    private class AsyncTaskRunner extends AsyncTask<String, String, String> {
-        String result = "";
-        ProgressDialog progressDialog;
+    private void downloadApk(String apkUrl,String apkName) {
+        try {
+            ProgressDialog progressDialog = ProgressDialog.show(getActivity(), "Downloading apk", "Downloading apk");;
+            String destination = getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + apkName;
+            Uri uri = Uri.parse("file://" + destination);
 
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                String apkName = params[1];
-                String apkUrl = params[0];
-                URL url = new URL(apkUrl + "" + apkName);
-                HttpURLConnection c = (HttpURLConnection) url
-                        .openConnection();
-                c.setRequestMethod("GET");
+            File file = new File(destination);
+            if (file.exists()) file.delete();
 
-                c.connect();
+            DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+            Uri downloadUrl = Uri.parse(apkUrl + apkName);
+            DownloadManager.Request request = new DownloadManager.Request(downloadUrl);
+            request.setMimeType("application/vnd.android.package-archive");
+            request.setTitle("APK is downloading...");
+            request.setDescription("Downloading...");
+            request.setDestinationUri(uri);
 
-                String PATH = Environment.getExternalStorageDirectory()
-                        + "/download/";
-                File file = new File(PATH);
-                file.mkdirs();
-                File outputFile = new File(file, apkName);
-                FileOutputStream fos = new FileOutputStream(outputFile);
+            showInstallOption(destination, uri);
 
-                InputStream is = c.getInputStream();
+            manager.enqueue(request);
+            Toast.makeText(getContext(), "Downloading...", Toast.LENGTH_LONG).show();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-                byte[] buffer = new byte[1024];
-                int len1 = 0;
-                while ((len1 = is.read(buffer)) != -1) {
-                    fos.write(buffer, 0, len1);
+    }
+
+    private void showInstallOption(String destination, Uri uri) {
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Uri uriForFile = FileProvider.getUriForFile(
+                            context, BuildConfig.APPLICATION_ID + ".provider",
+                            new File(destination)
+                    );
+                    Intent install = new Intent(Intent.ACTION_VIEW);
+                    install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    install.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+                    install.setData(uriForFile);
+                    context.startActivity(install);
+                    context.unregisterReceiver(this);
+
+                } else {
+                    Intent install = new Intent(Intent.ACTION_VIEW);
+                    install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    install.setDataAndType(uri, "\"application/vnd.android.package-archive\"");
+                    context.startActivity(install);
+                    context.unregisterReceiver(this);
                 }
-                fos.close();
-                is.close();
-                outputFile.setReadable(true, false);
-
-                Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                intent.setDataAndType(FileProvider.getUriForFile(getActivity(), "org.opendatakit.services.GenericFileProvider",
-                        new File(Environment.getExternalStorageDirectory() + "/download/" + apkName)), "application/vnd.android.package-archive");
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(intent);
-            } catch (Exception ex) {
-                result = "Update error! " + ex.getMessage();
-                ex.printStackTrace();
             }
-            return result;
-        }
-
-        public void onPreExecute() {
-            progressDialog = ProgressDialog.show(getActivity(), "Downloading apk", "Downloading apk");
-        }
-
-        protected void onPostExecute(String result) {
-            progressDialog.dismiss();
-            Log.i("RESULT:", result);
-            //Toast.makeText(getActivity().getApplicationContext(), result, Toast.LENGTH_LONG).show();
-        }
+        };
+        getContext().registerReceiver(broadcastReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 }
