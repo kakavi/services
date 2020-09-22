@@ -31,7 +31,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -125,7 +124,9 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
     mWorkManager = WorkManager.getInstance();
     startBackgroundJob();
 
-    doThis();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      requestUnknownSrceInstall();
+    }
 
     //firebase
     FirebaseInstanceId.getInstance().getInstanceId()
@@ -148,7 +149,7 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   }
 
   @RequiresApi(api = Build.VERSION_CODES.O)
-  private void doThis() {
+  private void requestUnknownSrceInstall() {
     if(!getPackageManager().canRequestPackageInstalls()){
       Toast.makeText(this, "Please allow Kenga Services to install from unknown sources", Toast.LENGTH_SHORT).show();
 
@@ -176,7 +177,9 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   @Override
   protected void onResume() {
     super.onResume();
-    doThis();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      requestUnknownSrceInstall();
+    }
   }
 
   private void launch() {
