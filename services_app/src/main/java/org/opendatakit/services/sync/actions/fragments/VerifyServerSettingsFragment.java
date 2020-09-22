@@ -525,7 +525,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
             request.setDescription("Downloading...");
             request.setDestinationUri(uri);
 
-            showInstallOption(destination, uri);
+            showInstallOption(destination, uri, progressDialog);
 
             manager.enqueue(request);
             Toast.makeText(getContext(), "Downloading...", Toast.LENGTH_LONG).show();
@@ -535,10 +535,11 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
 
     }
 
-    private void showInstallOption(String destination, Uri uri) {
+    private void showInstallOption(String destination, Uri uri,ProgressDialog progressDialog) {
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                progressDialog.dismiss();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     Uri uriForFile = FileProvider.getUriForFile(
                             context, BuildConfig.APPLICATION_ID + ".provider",
