@@ -31,7 +31,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -125,7 +124,20 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
     mWorkManager = WorkManager.getInstance();
     startBackgroundJob();
 
-    doThis();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      requestUnknownSrceInstall();
+    } else {
+      try{
+        boolean isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
+        if (!isNonPlayAppAllowed) {
+          startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
+        }
+      } catch (Exception e){
+        e.printStackTrace();
+      }
+    }
+
+    launch();
 
     //firebase
     FirebaseInstanceId.getInstance().getInstanceId()
@@ -148,41 +160,17 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   }
 
   @RequiresApi(api = Build.VERSION_CODES.O)
-  private void doThis() {
+  private void requestUnknownSrceInstall() {
+    if(!getPackageManager().canRequestPackageInstalls()){
+      Toast.makeText(this, "Please allow Kenga Services to install from unknown sources", Toast.LENGTH_SHORT).show();
 
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-      if (!getPackageManager().canRequestPackageInstalls()) {
-        Toast.makeText(this, "Please allow Kenga Services to install from unknown sources", Toast.LENGTH_SHORT).show();
-
-        new Handler().postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:org.opendatakit.services")));
-          }
-        }, 2000);
-
-      }
-    } else {
-      try {
-        boolean isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
-        if (!isNonPlayAppAllowed) {
-          Toast.makeText(this, "Please allow Kenga Services to install from unknown sources", Toast.LENGTH_SHORT).show();
-          new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-              startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
-            }
-          }, 2000);
+      new Handler().postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:org.opendatakit.services")));
         }
-      } catch (Exception e){
-        e.printStackTrace();
-      }
-    }
+      }, 2000);
 
-    try{
-      launch();
-    } catch (Exception e){
-      e.printStackTrace();
     }
   }
 
@@ -190,7 +178,19 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   @Override
   protected void onResume() {
     super.onResume();
-    doThis();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      requestUnknownSrceInstall();
+    } else {
+      try{
+        boolean isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
+        if (!isNonPlayAppAllowed) {
+          startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
+        }
+      } catch (Exception e){
+        e.printStackTrace();
+      }
+    }
+    launch();
   }
 
   private void launch() {
