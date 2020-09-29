@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +51,8 @@ abstract class AbsSyncUIFragment extends Fragment implements
 
 
     final Handler handler = new Handler();
-    TextView uriField;
+    EditText uriField;
+    TextView uriField2;
     TextView accountAuthType;
     TextView accountIdentity;
 
@@ -112,7 +114,8 @@ abstract class AbsSyncUIFragment extends Fragment implements
      * @param view
      */
     void populateTextViewMemberVariablesReferences(View view) {
-        uriField = view.findViewById(R.id.sync_uri_field);
+        uriField = view.findViewById(R.id.sync_uri_field_edit);
+        uriField2 = view.findViewById(R.id.sync_uri_field);
         accountAuthType = view.findViewById(R.id.sync_account_auth_label);
         accountIdentity = view.findViewById(R.id.sync_account);
 
@@ -257,7 +260,8 @@ abstract class AbsSyncUIFragment extends Fragment implements
     void updateCredentialsUI() {
         PropertiesSingleton props = ((IOdkAppPropertiesActivity) this.getActivity()).getProps();
         if(props != null) {
-            uriField.setText(props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL));
+            if(uriField!=null){uriField.setText(props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL));}
+            if(uriField2!=null){uriField2.setText(props.getProperty(CommonToolProperties.KEY_SYNC_SERVER_URL));}
 
             String credentialToUse = props.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
             String[] credentialValues = getResources().getStringArray(R.array.credential_entry_values);

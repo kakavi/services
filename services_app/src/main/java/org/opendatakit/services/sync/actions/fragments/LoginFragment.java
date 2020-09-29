@@ -27,16 +27,19 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import org.opendatakit.consts.IntentConsts;
 import org.opendatakit.consts.RequestCodeConsts;
 import org.opendatakit.logging.WebLogger;
 import org.opendatakit.properties.CommonToolProperties;
 import org.opendatakit.properties.PropertiesSingleton;
 import org.opendatakit.services.R;
+import org.opendatakit.services.preferences.activities.AppPropertiesActivity;
 import org.opendatakit.services.preferences.activities.IOdkAppPropertiesActivity;
 import org.opendatakit.services.sync.actions.LoginActions;
 import org.opendatakit.services.sync.actions.activities.DoSyncActionCallback;
 import org.opendatakit.services.sync.actions.activities.ISyncServiceInterfaceActivity;
 import org.opendatakit.services.sync.actions.activities.LoginActivity;
+import org.opendatakit.services.sync.actions.activities.VerifyServerSettingsActivity;
 import org.opendatakit.services.utilities.ODKServicesPropertyUtils;
 import org.opendatakit.services.utilities.TableHealthValidator;
 import org.opendatakit.sync.service.IOdkSyncServiceInterface;
@@ -112,6 +115,8 @@ public class LoginFragment extends AbsSyncUIFragment {
 
       props = ((IOdkAppPropertiesActivity) this.getActivity()).getProps();
 
+      Button installButton = (Button) view.findViewById(R.id.open_install_apps);
+
       populateTextViewMemberVariablesReferences(view);
 
       if (savedInstanceState != null && savedInstanceState.containsKey(LOGIN_ACTION)) {
@@ -147,6 +152,15 @@ public class LoginFragment extends AbsSyncUIFragment {
             setNewCredentials();
             refreshCredentialsDisplay();
             verifyServerSettings(v);
+
+             String authType = props.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
+             boolean isAnonymous = (authType == null) || (authType.length() == 0) ||
+                     getString(R.string.credential_type_none).equals(authType);
+
+             if ( props.getProperty(CommonToolProperties.KEY_ROLES_LIST).length() != 0 &&
+                     isAnonymous ) {
+                 installButton.setVisibility(View.VISIBLE);
+             }
          }
       });
 
@@ -168,6 +182,15 @@ public class LoginFragment extends AbsSyncUIFragment {
 
       });
 
+      installButton.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View v) {
+            Intent intent = new Intent(view.getContext(), VerifyServerSettingsActivity.class);
+            intent.putExtra(IntentConsts.INTENT_KEY_APP_NAME, getAppName());
+            startActivity(intent);
+         }
+      });
+
       return view;
    }
 
@@ -175,10 +198,12 @@ public class LoginFragment extends AbsSyncUIFragment {
 
       String username = usernameEditText.getText().toString();
       String pw = passwordEditText.getText().toString();
+      String url = uriField.getText().toString();
 
       Map<String, String> properties = new HashMap<String, String>();
       properties.put(CommonToolProperties.KEY_AUTHENTICATION_TYPE,
           getString(R.string.credential_type_username_password));
+      properties.put(CommonToolProperties.KEY_SYNC_SERVER_URL, url);
       properties.put(CommonToolProperties.KEY_USERNAME, username);
       properties.put(CommonToolProperties.KEY_PASSWORD, pw);
       properties.put(CommonToolProperties.KEY_DEFAULT_GROUP, "");

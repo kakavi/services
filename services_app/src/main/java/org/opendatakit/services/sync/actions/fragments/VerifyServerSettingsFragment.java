@@ -18,10 +18,7 @@ package org.opendatakit.services.sync.actions.fragments;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.*;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.*;
@@ -37,6 +34,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import org.opendatakit.consts.IntentConsts;
+import org.opendatakit.consts.RequestCodeConsts;
 import org.opendatakit.httpclientandroidlib.HttpResponse;
 import org.opendatakit.httpclientandroidlib.client.HttpClient;
 import org.opendatakit.httpclientandroidlib.client.methods.HttpGet;
@@ -63,6 +62,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import static android.app.Activity.RESULT_CANCELED;
 
 /**
  * @author mitchellsundt@gmail.com
@@ -179,6 +180,16 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
         return view;
     }
 
+    private void refresh(Context context) {
+        Activity a = (Activity) context;
+        if(a != null) {
+            a.finish();
+            a.overridePendingTransition(0, 0);
+            startActivity(a.getIntent());
+            a.overridePendingTransition(0, 0);
+        }
+    }
+
 
     private void disableButtons() {
         startVerifyServerSettings.setEnabled(false);
@@ -206,27 +217,53 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
         if (isSurveyInstalled) {
             //installed
             installSurveyBtn.setEnabled(false);
+            installSurveyBtn.setText("Installed Survey");
         } else {
             //not installed
             installSurveyBtn.setEnabled(true);
+            installSurveyBtn.setText("Install Survey");
             installSurveyBtn.setBackgroundColor(Color.parseColor("#D30000"));
         }
 
         if (isTablesInstalled) {
             //installed
             installTablesBtn.setEnabled(false);
+            installTablesBtn.setText("Installed Everflow");
+            Button openEverflow = (Button) view.findViewById(R.id.open_everflow);
+            openEverflow.setVisibility(View.VISIBLE);
+            openEverflow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        Intent intent = new Intent();
+                        intent.setComponent(
+                                new ComponentName("org.opendatakit.tables", "org.opendatakit.tables.activities.Launcher"));
+                        intent.setAction(Intent.ACTION_DEFAULT);
+                        Bundle bundle = new Bundle();
+                        bundle.putString(IntentConsts.INTENT_KEY_APP_NAME, getAppName());
+                        intent.putExtras(bundle);
+                        startActivityForResult(intent, RequestCodeConsts.RequestCodes.LAUNCH_SYNC);
+                    } catch (ActivityNotFoundException e) {
+                        WebLogger.getLogger(getAppName()).printStackTrace(e);
+                        Toast.makeText(view.getContext(), "Everflow is not installed", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
         } else {
             //not installed
             installTablesBtn.setEnabled(true);
+            installTablesBtn.setText("Install Everflow");
             installTablesBtn.setBackgroundColor(Color.parseColor("#D30000"));
         }
 
         if (isIOInstalled) {
             //installed
             installIoFileManagerBtn.setEnabled(false);
+            installIoFileManagerBtn.setText("Installed FileManager");
         } else {
             //not installed
             installIoFileManagerBtn.setEnabled(true);
+            installIoFileManagerBtn.setText("Install FileManager");
             installIoFileManagerBtn.setBackgroundColor(Color.parseColor("#D30000"));
         }
 
@@ -237,10 +274,20 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == VerifyServerSettingsActivity.AUTHORIZE_ACCOUNT_RESULT_CODE) {
-            if (resultCode == Activity.RESULT_CANCELED) {
+            if (resultCode == RESULT_CANCELED) {
                 verifyServerSettingsAction = VerifyServerSettingsActions.IDLE;
             }
             postTaskToAccessSyncService();
+        }
+
+        if (requestCode == 1) {
+            // resultCode == RESULT_CANCELED means user pressed `Done` button after installation
+            if (resultCode == RESULT_CANCELED) {
+                refresh(getContext());
+            } else{
+                //Check for the packagename to verify if user clicked on cancle button
+                Toast.makeText(getContext(), "Installed successfully", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -550,14 +597,14 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     install.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
                     install.setData(uriForFile);
-                    context.startActivity(install);
+                    startActivityForResult(install, 1);
                     context.unregisterReceiver(this);
 
                 } else {
                     Intent install = new Intent(Intent.ACTION_VIEW);
                     install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     install.setDataAndType(uri, "\"application/vnd.android.package-archive\"");
-                    context.startActivity(install);
+                    startActivityForResult(install, 1);
                     context.unregisterReceiver(this);
                 }
             }

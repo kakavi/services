@@ -54,6 +54,7 @@ import org.opendatakit.services.preferences.activities.AppPropertiesActivity;
 import org.opendatakit.services.preferences.fragments.ServerSettingsFragment;
 import org.opendatakit.services.resolve.conflict.AllConflictsResolutionActivity;
 import org.opendatakit.services.sync.actions.activities.*;
+import org.opendatakit.services.sync.actions.fragments.LoginFragment;
 import org.opendatakit.services.sync.actions.fragments.SyncFragment;
 import org.opendatakit.services.sync.service.OdkSyncJob;
 import org.opendatakit.services.utilities.ODKServicesPropertyUtils;
@@ -200,33 +201,23 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
       appName = ODKFileUtils.getOdkDefaultAppName();
     }
 
+    firstLaunch();
+    WebLogger.getLogger(getAppName()).i(TAG, "[onResume] getting SyncFragment");
+
     //check if apps installed
+/*
     boolean isIOInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.openintents.filemanager", this.getPackageManager());
     boolean isSurveyInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.survey", this.getPackageManager());
     boolean isTablesInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.tables", this.getPackageManager());
 
-    if(isIOInstalled || isSurveyInstalled || isTablesInstalled) {
-      //installed
-      //hide app
-/*      PackageManager p = getPackageManager();
-      p.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);*/
-
-    } else {
+    if (!isIOInstalled || !isSurveyInstalled || !isTablesInstalled) {
       //not installed
-      //show app
-/*      PackageManager p = getPackageManager();
-      ComponentName componentName = new ComponentName(this, MainActivity.class);
-      p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);*/
-
       Toast.makeText(this, "Please install app to continue", Toast.LENGTH_SHORT).show();
       Intent i = new Intent(this, VerifyServerSettingsActivity.class);
       i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, appName);
       startActivity(i);
     }
-
-    firstLaunch();
-    WebLogger.getLogger(getAppName()).i(TAG, "[onResume] getting SyncFragment");
-
+*/
 
     FragmentManager mgr = getSupportFragmentManager();
     String newFragmentName;
@@ -435,28 +426,34 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   private void firstLaunch() {
     mProps = CommonToolProperties.get(this, appName);
 
-    boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
+   /* boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
     if (isFirstLaunch) {
-      // set first launch to false
+        // set first launch to false
       mProps.setProperties(Collections.singletonMap(CommonToolProperties
               .KEY_FIRST_LAUNCH, "false"));
+    */
+
+    String authType = mProps.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
+    boolean isAnonymous = (authType == null) || (authType.length() == 0) ||
+            getString(R.string.credential_type_none).equals(authType);
+
+    if ( mProps.getProperty(CommonToolProperties.KEY_ROLES_LIST).length() == 0 &&
+            !isAnonymous ) {
+
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
       mDialog = builder.setMessage(R.string.configure_server_settings)
               .setCancelable(false)
-              .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+              .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 @Override public void onClick(DialogInterface dialog, int which) {
                   mDialog.dismiss();
 
                   getSupportFragmentManager()
                           .beginTransaction()
-                          .replace(R.id.sync_activity_view, new ServerSettingsFragment())
+                          .replace(R.id.sync_activity_view, new LoginFragment())
                           .addToBackStack(null)
                           .commit();
-                }
-              })
-              .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                @Override public void onClick(DialogInterface dialog, int which) {
-                  dialog.dismiss();
+
+                  mDialog.dismiss();
                 }
               }).create();
       mDialog.setCanceledOnTouchOutside(false);

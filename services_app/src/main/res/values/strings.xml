@@ -384,7 +384,9 @@
     <string name="allow">Allow</string>
     <string name="not_now">Not now</string>
     <string name="no">No</string>
-    <string name="configure_server_settings">Do you want to configure the server settings now?</string>
+    <string name="configure_server_settings">Please login first before you continue</string>
     <string name="home">Home</string>
     <string name="sync">Sync</string>
+    <string name="install_app">Install Apps</string>
+    <string name="open_everflow">Open Everflow</string>
 </resources>
