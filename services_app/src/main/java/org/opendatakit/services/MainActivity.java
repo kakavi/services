@@ -35,6 +35,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -125,19 +126,6 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
     mWorkManager = WorkManager.getInstance();
     startBackgroundJob();
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      requestUnknownSrceInstall();
-    } else {
-      try{
-        boolean isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
-        if (!isNonPlayAppAllowed) {
-          startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
-        }
-      } catch (Exception e){
-        e.printStackTrace();
-      }
-    }
-
     launch();
 
     //firebase
@@ -179,6 +167,11 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   @Override
   protected void onResume() {
     super.onResume();
+    launch();
+  }
+
+  private void launch() {
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       requestUnknownSrceInstall();
     } else {
@@ -191,10 +184,6 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
         e.printStackTrace();
       }
     }
-    launch();
-  }
-
-  private void launch() {
 
     appName = getIntent().getStringExtra(IntentConsts.INTENT_KEY_APP_NAME);
     if (appName == null) {
@@ -424,7 +413,8 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   }
 
   private void firstLaunch() {
-    mProps = CommonToolProperties.get(this, appName);
+    try {
+      mProps = CommonToolProperties.get(this, appName);
 
    /* boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
     if (isFirstLaunch) {
@@ -433,31 +423,20 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
               .KEY_FIRST_LAUNCH, "false"));
     */
 
-    String authType = mProps.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
-    boolean isAnonymous = (authType == null) || (authType.length() == 0) ||
-            getString(R.string.credential_type_none).equals(authType);
+      String authType = mProps.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
+      boolean isAnonymous = (authType == null) || (authType.length() == 0) ||
+              getString(R.string.credential_type_none).equals(authType);
 
-    if ( mProps.getProperty(CommonToolProperties.KEY_ROLES_LIST).length() == 0 &&
-            !isAnonymous ) {
-
-      AlertDialog.Builder builder = new AlertDialog.Builder(this);
-      mDialog = builder.setMessage(R.string.configure_server_settings)
-              .setCancelable(false)
-              .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                @Override public void onClick(DialogInterface dialog, int which) {
-                  mDialog.dismiss();
-
-                  getSupportFragmentManager()
-                          .beginTransaction()
-                          .replace(R.id.sync_activity_view, new LoginFragment())
-                          .addToBackStack(null)
-                          .commit();
-
-                  mDialog.dismiss();
-                }
-              }).create();
-      mDialog.setCanceledOnTouchOutside(false);
-      mDialog.show();
+      if (mProps.getProperty(CommonToolProperties.KEY_ROLES_LIST).length() == 0 &&
+              !isAnonymous) {
+              getSupportFragmentManager()
+                      .beginTransaction()
+                      .replace(R.id.sync_activity_view, new LoginFragment())
+                      .addToBackStack(null)
+                      .commit();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }

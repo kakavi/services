@@ -122,6 +122,7 @@
             android:layout_marginTop="10dp"
             android:text="@string/new_user"/>
 
+<!--
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -155,6 +156,7 @@
                 android:textSize="14sp"
                 android:text="@string/cancel"/>
     </LinearLayout>
+-->
 
     <Space
             android:layout_width="match_parent"

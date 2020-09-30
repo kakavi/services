@@ -16,6 +16,7 @@
 package org.opendatakit.services.sync.actions.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -73,8 +74,9 @@ public class LoginFragment extends AbsSyncUIFragment {
    private EditText passwordEditText;
    private CheckBox togglePasswordText;
    private Button authenticateNewUser;
-   private Button logout;
-   private Button cancel;
+   private Button installButton;
+   //private Button logout;
+   //private Button cancel;
 
    private LoginActions loginAction = LoginActions.IDLE;
 
@@ -114,8 +116,7 @@ public class LoginFragment extends AbsSyncUIFragment {
       View view = inflater.inflate(ID, container, false);
 
       props = ((IOdkAppPropertiesActivity) this.getActivity()).getProps();
-
-      Button installButton = (Button) view.findViewById(R.id.open_install_apps);
+      installButton = (Button) view.findViewById(R.id.open_install_apps);
 
       populateTextViewMemberVariablesReferences(view);
 
@@ -152,19 +153,10 @@ public class LoginFragment extends AbsSyncUIFragment {
             setNewCredentials();
             refreshCredentialsDisplay();
             verifyServerSettings(v);
-
-             String authType = props.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
-             boolean isAnonymous = (authType == null) || (authType.length() == 0) ||
-                     getString(R.string.credential_type_none).equals(authType);
-
-             if ( props.getProperty(CommonToolProperties.KEY_ROLES_LIST).length() != 0 &&
-                     isAnonymous ) {
-                 installButton.setVisibility(View.VISIBLE);
-             }
          }
       });
 
-      logout = view.findViewById(R.id.logout_button);
+    /*  logout = view.findViewById(R.id.logout_button);
       logout.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
@@ -180,7 +172,7 @@ public class LoginFragment extends AbsSyncUIFragment {
             getActivity().finish();
          }
 
-      });
+      });*/
 
       installButton.setOnClickListener(new View.OnClickListener() {
          @Override
@@ -259,8 +251,8 @@ public class LoginFragment extends AbsSyncUIFragment {
 
    private void disableButtons() {
       authenticateNewUser.setEnabled(false);
-      logout.setEnabled(false);
-      cancel.setEnabled(false);
+      //logout.setEnabled(false);
+      //cancel.setEnabled(false);
    }
 
    void perhapsEnableButtons() {
@@ -270,8 +262,8 @@ public class LoginFragment extends AbsSyncUIFragment {
          disableButtons();
       } else {
          authenticateNewUser.setEnabled(true);
-         logout.setEnabled(true);
-         cancel.setEnabled(true);
+         //logout.setEnabled(true);
+         //cancel.setEnabled(true);
       }
    }
 
@@ -558,10 +550,21 @@ public class LoginFragment extends AbsSyncUIFragment {
              /** earlier sync ended successfully without conflicts and all row-level attachments sync'd */ SYNC_COMPLETE:
             id_title = R.string.verify_server_setttings_successful;
             message = getString(R.string.verify_server_setttings_successful_text);
+            installButton.setVisibility(View.VISIBLE);
             break;
          }
 
          createAlertDialog(getString(id_title), message);
+      }
+   }
+
+   private void refresh(Context context) {
+      Activity a = (Activity) context;
+      if(a != null) {
+         a.finish();
+         a.overridePendingTransition(0, 0);
+         startActivity(a.getIntent());
+         a.overridePendingTransition(0, 0);
       }
    }
 }
