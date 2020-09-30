@@ -35,7 +35,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -52,19 +51,16 @@ import org.opendatakit.properties.CommonToolProperties;
 import org.opendatakit.properties.PropertiesSingleton;
 import org.opendatakit.services.database.AndroidConnectFactory;
 import org.opendatakit.services.preferences.activities.AppPropertiesActivity;
-import org.opendatakit.services.preferences.fragments.ServerSettingsFragment;
 import org.opendatakit.services.resolve.conflict.AllConflictsResolutionActivity;
 import org.opendatakit.services.sync.actions.activities.*;
 import org.opendatakit.services.sync.actions.fragments.LoginFragment;
 import org.opendatakit.services.sync.actions.fragments.SyncFragment;
 import org.opendatakit.services.sync.service.OdkSyncJob;
-import org.opendatakit.services.utilities.ODKServicesPropertyUtils;
 import org.opendatakit.sync.service.IOdkSyncServiceInterface;
 import org.opendatakit.sync.service.SyncAttachmentState;
 import org.opendatakit.utilities.ODKFileUtils;
 import org.opendatakit.utilities.RuntimePermissionUtils;
 
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivity,
@@ -126,6 +122,7 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
     mWorkManager = WorkManager.getInstance();
     startBackgroundJob();
 
+    requestAllowInstallFromUnknownSources();
     launch();
 
     //firebase
@@ -148,8 +145,23 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
             });
   }
 
+  private void requestAllowInstallFromUnknownSources(){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      unknownSourcesForHigherVersions();
+    } else {
+      try{
+        boolean isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
+        if (!isNonPlayAppAllowed) {
+          startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
+        }
+      } catch (Exception e){
+        e.printStackTrace();
+      }
+    }
+  }
+
   @RequiresApi(api = Build.VERSION_CODES.O)
-  private void requestUnknownSrceInstall() {
+  private void unknownSourcesForHigherVersions() {
     if(!getPackageManager().canRequestPackageInstalls()){
       Toast.makeText(this, "Please allow Kenga Services to install from unknown sources", Toast.LENGTH_SHORT).show();
 
@@ -171,20 +183,6 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   }
 
   private void launch() {
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      requestUnknownSrceInstall();
-    } else {
-      try{
-        boolean isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
-        if (!isNonPlayAppAllowed) {
-          startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
-        }
-      } catch (Exception e){
-        e.printStackTrace();
-      }
-    }
-
     appName = getIntent().getStringExtra(IntentConsts.INTENT_KEY_APP_NAME);
     if (appName == null) {
       appName = ODKFileUtils.getOdkDefaultAppName();
