@@ -51,18 +51,16 @@ import org.opendatakit.properties.CommonToolProperties;
 import org.opendatakit.properties.PropertiesSingleton;
 import org.opendatakit.services.database.AndroidConnectFactory;
 import org.opendatakit.services.preferences.activities.AppPropertiesActivity;
-import org.opendatakit.services.preferences.fragments.ServerSettingsFragment;
 import org.opendatakit.services.resolve.conflict.AllConflictsResolutionActivity;
 import org.opendatakit.services.sync.actions.activities.*;
+import org.opendatakit.services.sync.actions.fragments.LoginFragment;
 import org.opendatakit.services.sync.actions.fragments.SyncFragment;
 import org.opendatakit.services.sync.service.OdkSyncJob;
-import org.opendatakit.services.utilities.ODKServicesPropertyUtils;
 import org.opendatakit.sync.service.IOdkSyncServiceInterface;
 import org.opendatakit.sync.service.SyncAttachmentState;
 import org.opendatakit.utilities.ODKFileUtils;
 import org.opendatakit.utilities.RuntimePermissionUtils;
 
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivity,
@@ -124,9 +122,8 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
     mWorkManager = WorkManager.getInstance();
     startBackgroundJob();
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      requestUnknownSrceInstall();
-    }
+    requestAllowInstallFromUnknownSources();
+    launch();
 
     //firebase
     FirebaseInstanceId.getInstance().getInstanceId()
@@ -148,8 +145,23 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
             });
   }
 
+  private void requestAllowInstallFromUnknownSources(){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      unknownSourcesForHigherVersions();
+    } else {
+      try{
+        boolean isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
+        if (!isNonPlayAppAllowed) {
+          startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
+        }
+      } catch (Exception e){
+        e.printStackTrace();
+      }
+    }
+  }
+
   @RequiresApi(api = Build.VERSION_CODES.O)
-  private void requestUnknownSrceInstall() {
+  private void unknownSourcesForHigherVersions() {
     if(!getPackageManager().canRequestPackageInstalls()){
       Toast.makeText(this, "Please allow Kenga Services to install from unknown sources", Toast.LENGTH_SHORT).show();
 
@@ -161,61 +173,38 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
       }, 2000);
 
     }
-
-    try{
-      boolean isNonPlayAppAllowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS) == 1;
-      if (!isNonPlayAppAllowed) {
-        startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
-      }
-      launch();
-    } catch (Exception e){
-      e.printStackTrace();
-    }
   }
 
   @RequiresApi(api = Build.VERSION_CODES.O)
   @Override
   protected void onResume() {
     super.onResume();
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      requestUnknownSrceInstall();
-    }
+    launch();
   }
 
   private void launch() {
-
     appName = getIntent().getStringExtra(IntentConsts.INTENT_KEY_APP_NAME);
     if (appName == null) {
       appName = ODKFileUtils.getOdkDefaultAppName();
     }
 
+    firstLaunch();
+    WebLogger.getLogger(getAppName()).i(TAG, "[onResume] getting SyncFragment");
+
     //check if apps installed
+/*
     boolean isIOInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.openintents.filemanager", this.getPackageManager());
     boolean isSurveyInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.survey", this.getPackageManager());
     boolean isTablesInstalled = ODKServicesPropertyUtils.isPackageInstalled("org.opendatakit.tables", this.getPackageManager());
 
-    if(isIOInstalled || isSurveyInstalled || isTablesInstalled) {
-      //installed
-      //hide app
-/*      PackageManager p = getPackageManager();
-      p.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);*/
-
-    } else {
+    if (!isIOInstalled || !isSurveyInstalled || !isTablesInstalled) {
       //not installed
-      //show app
-/*      PackageManager p = getPackageManager();
-      ComponentName componentName = new ComponentName(this, MainActivity.class);
-      p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);*/
-
       Toast.makeText(this, "Please install app to continue", Toast.LENGTH_SHORT).show();
       Intent i = new Intent(this, VerifyServerSettingsActivity.class);
       i.putExtra(IntentConsts.INTENT_KEY_APP_NAME, appName);
       startActivity(i);
     }
-
-    firstLaunch();
-    WebLogger.getLogger(getAppName()).i(TAG, "[onResume] getting SyncFragment");
-
+*/
 
     FragmentManager mgr = getSupportFragmentManager();
     String newFragmentName;
@@ -422,34 +411,30 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
   }
 
   private void firstLaunch() {
-    mProps = CommonToolProperties.get(this, appName);
+    try {
+      mProps = CommonToolProperties.get(this, appName);
 
-    boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
+   /* boolean isFirstLaunch = mProps.getBooleanProperty(CommonToolProperties.KEY_FIRST_LAUNCH);
     if (isFirstLaunch) {
-      // set first launch to false
+        // set first launch to false
       mProps.setProperties(Collections.singletonMap(CommonToolProperties
               .KEY_FIRST_LAUNCH, "false"));
-      AlertDialog.Builder builder = new AlertDialog.Builder(this);
-      mDialog = builder.setMessage(R.string.configure_server_settings)
-              .setCancelable(false)
-              .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                @Override public void onClick(DialogInterface dialog, int which) {
-                  mDialog.dismiss();
+    */
 
-                  getSupportFragmentManager()
-                          .beginTransaction()
-                          .replace(R.id.sync_activity_view, new ServerSettingsFragment())
-                          .addToBackStack(null)
-                          .commit();
-                }
-              })
-              .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                @Override public void onClick(DialogInterface dialog, int which) {
-                  dialog.dismiss();
-                }
-              }).create();
-      mDialog.setCanceledOnTouchOutside(false);
-      mDialog.show();
+      String authType = mProps.getProperty(CommonToolProperties.KEY_AUTHENTICATION_TYPE);
+      boolean isAnonymous = (authType == null) || (authType.length() == 0) ||
+              getString(R.string.credential_type_none).equals(authType);
+
+      if (mProps.getProperty(CommonToolProperties.KEY_ROLES_LIST).length() == 0 &&
+              !isAnonymous) {
+              getSupportFragmentManager()
+                      .beginTransaction()
+                      .replace(R.id.sync_activity_view, new LoginFragment())
+                      .addToBackStack(null)
+                      .commit();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }
