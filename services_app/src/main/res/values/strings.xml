@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Kenga Services</string>
 
-    <string name="services_notice">Kenga Services provides database, file access, and data synchronization services to Everflow and Kenga Survey.</string>
+    <string name="services_notice">Kenga Services provides database, file access, and data synchronization services to Community TB and Kenga Survey.</string>
     <string name="action_admin_settings">Admin Settings</string>
     <string name="action_settings">Settings</string>
     <string name="action_about">About</string>
@@ -216,7 +216,7 @@
         Please update your settings.</string>
 
     <string name="verify_server_settings_start">Verify User Permissions</string>
-    <string name="install_tables_label">Install Everflow</string>
+    <string name="install_tables_label">Install Community TB</string>
     <string name="install_forms_label">Install Kenga Survey</string>
     <string name="install_IO_label">Install IO File Manager</string>
     <string name="verify_server_settings_starting">Starting fetch of user permissions&#8230;</string>
@@ -388,5 +388,5 @@
     <string name="home">Home</string>
     <string name="sync">Sync</string>
     <string name="install_app">Install Apps</string>
-    <string name="open_everflow">Open Everflow</string>
+    <string name="open_everflow">Open Community TB</string>
 </resources>

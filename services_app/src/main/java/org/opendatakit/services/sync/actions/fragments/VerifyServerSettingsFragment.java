@@ -228,7 +228,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
         if (isTablesInstalled) {
             //installed
             installTablesBtn.setEnabled(false);
-            installTablesBtn.setText("Installed Everflow");
+            installTablesBtn.setText("Installed Community TB");
             Button openEverflow = (Button) view.findViewById(R.id.open_everflow);
             openEverflow.setVisibility(View.VISIBLE);
             openEverflow.setOnClickListener(new View.OnClickListener() {
@@ -245,14 +245,14 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                         startActivityForResult(intent, RequestCodeConsts.RequestCodes.LAUNCH_SYNC);
                     } catch (ActivityNotFoundException e) {
                         WebLogger.getLogger(getAppName()).printStackTrace(e);
-                        Toast.makeText(view.getContext(), "Everflow is not installed", Toast.LENGTH_LONG).show();
+                        Toast.makeText(view.getContext(), "Community TB is not installed", Toast.LENGTH_LONG).show();
                     }
                 }
             });
         } else {
             //not installed
             installTablesBtn.setEnabled(true);
-            installTablesBtn.setText("Install Everflow");
+            installTablesBtn.setText("Install Community TB");
             installTablesBtn.setBackgroundColor(Color.parseColor("#D30000"));
         }
 

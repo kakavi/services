@@ -252,7 +252,7 @@ public class MainActivity extends AbsSyncBaseActivity implements IAppAwareActivi
         this.startActivityForResult(intent, RequestCodeConsts.RequestCodes.LAUNCH_SYNC);
       } catch (ActivityNotFoundException e) {
         WebLogger.getLogger(appName).printStackTrace(e);
-        Toast.makeText(this, "Everflow is not installed", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Community TB is not installed", Toast.LENGTH_LONG).show();
       }
       return true;
     }

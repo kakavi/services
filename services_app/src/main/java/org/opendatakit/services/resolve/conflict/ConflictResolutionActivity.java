@@ -173,7 +173,7 @@ public class ConflictResolutionActivity extends AppCompatActivity implements IAp
         this.startActivityForResult(intent, RequestCodeConsts.RequestCodes.LAUNCH_SYNC);
       } catch (ActivityNotFoundException e) {
         WebLogger.getLogger(mAppName).printStackTrace(e);
-        Toast.makeText(this, "Everflow is not installed", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Community TB is not installed", Toast.LENGTH_LONG).show();
       }
       return true;
     }
