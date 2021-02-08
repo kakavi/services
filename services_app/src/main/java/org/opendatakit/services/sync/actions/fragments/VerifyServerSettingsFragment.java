@@ -163,7 +163,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
             if (areCredentialsConfigured(true)) {
                 installTablesBtn.setEnabled(false);
 //                new AsyncTaskRunner().execute("http://206.189.209.21/", "tables_app.apk");
-                downloadApk("http://206.189.209.21/", "tables_app.apk");
+                downloadApk("http://206.189.209.21/", "brac_app.apk");
             }
         });
         installSurveyBtn.setOnClickListener(v -> {
@@ -171,7 +171,7 @@ public class VerifyServerSettingsFragment extends AbsSyncUIFragment {
                     "[" + getId() + "] [installSurveyBtn] timestamp: " + System.currentTimeMillis());
             if (areCredentialsConfigured(true)) {
                 installSurveyBtn.setEnabled(false);
-                downloadApk("http://206.189.209.21/", "survey_app.apk");
+                downloadApk("http://206.189.209.21/", "survey_app_brac.apk");
             }
         });
 
